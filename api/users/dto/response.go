@@ -7,6 +7,11 @@ type Response struct {
 	Body    interface{} `json:"body,omitempty"`
 }
 
+type TokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 // UserOutput represents user data in responses
 type UserOutput struct {
 	UUID            string `json:"uuid" example:"550e8400-e29b-41d4-a716-446655440000"`

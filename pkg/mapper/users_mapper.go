@@ -7,8 +7,8 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-func MapUserInputToModel(input dto.Users) models.Users {
-	var user models.Users
+func MapUserMTO(input models.Users) dto.UserOutput {
+	var user dto.UserOutput
 
 	mapstructure.Decode(input, &user)
 	return user

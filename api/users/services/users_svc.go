@@ -8,11 +8,7 @@ import (
 )
 
 type CompServices interface {
-	Create(ctx *gin.Context, data dto.Users) *exceptions.Exception
-	Login(ctx *gin.Context, email, password string) (accessToken, refreshToken string, err *exceptions.Exception)
+	Login(ctx *gin.Context, data dto.LoginRequest) (*dto.TokenResponse, *exceptions.Exception) 
 	RefreshToken(ctx *gin.Context, refreshToken string) (accessToken string, err *exceptions.Exception)
 	Logout(ctx *gin.Context, accessToken, refreshToken string) *exceptions.Exception
-	CreateVerificationToken(ctx *gin.Context, userUUID string) (*string, *exceptions.Exception)
-	ResendVerificationEmail(ctx *gin.Context, email string) *exceptions.Exception
-	VerificationEmail(ctx *gin.Context, token string) *exceptions.Exception
 }

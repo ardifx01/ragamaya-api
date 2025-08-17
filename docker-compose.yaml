@@ -1,0 +1,12 @@
+services:
+  ragamaya-api:
+    container_name: ragamaya-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "ragamaya-api:1.0.4"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "${PORT}:${PORT}"

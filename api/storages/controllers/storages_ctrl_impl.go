@@ -6,7 +6,6 @@ import (
 	"ragamaya-api/api/storages/services"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
-	"ragamaya-api/pkg/logger"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -115,7 +114,6 @@ func (h *CompControllersImpl) Images(ctx *gin.Context) {
 func (h *CompControllersImpl) Image(ctx *gin.Context) {
 	form, exc := ctx.MultipartForm()
 	if exc != nil {
-		logger.Error(exc.Error())
 		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
 		return
 	}

@@ -7,8 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
-	"time"
 	"ragamaya-api/models"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mssola/user_agent"
@@ -91,7 +92,9 @@ func RequestResponseLogger() gin.HandlerFunc {
 		start := time.Now()
 
 		var reqBody []byte
-		if c.Request.Body != nil {
+		
+		contentType := c.GetHeader("Content-Type")
+		if c.Request.Body != nil && !strings.HasPrefix(contentType, "multipart/") {
 			bodyBytes, _ := ioutil.ReadAll(io.LimitReader(c.Request.Body, 1024))
 			reqBody = bodyBytes
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))

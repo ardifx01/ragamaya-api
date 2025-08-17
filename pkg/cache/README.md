@@ -396,4 +396,4 @@ if memoryCache, ok := cache.(*cache.MemoryCache); ok {
 
 ## License
 
-This cache layer is part of the Xanny Go Template project and follows the same license terms. 
+This cache layer is part of the Ragamaya project and follows the same license terms. 

@@ -1,4 +1,4 @@
-// @title Xanny Go Template API
+// @title Ragamaya API
 // @version 1.0
 // @description A comprehensive Go API template with authentication, user management, and health monitoring.
 // @termsOfService http://swagger.io/terms/
@@ -26,13 +26,13 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
-	"time"
 	"ragamaya-api/docs"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/logger"
 	"ragamaya-api/pkg/middleware"
 	"ragamaya-api/routers"
+	"syscall"
+	"time"
 
 	internalRouters "ragamaya-api/internal/routers"
 	"ragamaya-api/pkg/helpers"
@@ -67,6 +67,7 @@ func main() {
 	r.Use(cors.New(corsConfig))
 
 	db := config.InitDB()
+	storage := config.InitStorage()
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	lmt := tollbooth.NewLimiter(5, &limiter.ExpirableOptions{DefaultExpirationTTL: time.Second})
 
@@ -78,7 +79,7 @@ func main() {
 	internalRouters.InternalRouters(internal, db, validate)
 
 	api := r.Group("/api")
-	routers.CompRouters(api, db, validate)
+	routers.CompRouters(api, db, storage, validate)
 
 	var host string
 	switch environment {

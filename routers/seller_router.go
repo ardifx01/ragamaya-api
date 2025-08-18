@@ -12,7 +12,7 @@ func SellerRoutes(r *gin.RouterGroup, compControllers controllers.CompController
 	{
 		sellerGroup.GET("/:uuid", compControllers.FindByUUID)
 		sellerGroup.POST("/register", middleware.AuthMiddleware(), compControllers.Register)
-		sellerGroup.PATCH("/update", middleware.AuthMiddleware(), compControllers.Update)
-		sellerGroup.DELETE("/delete", middleware.AuthMiddleware(), compControllers.Delete)
+		sellerGroup.PATCH("/update", middleware.SellerMiddleware(), compControllers.Update)
+		sellerGroup.DELETE("/delete", middleware.SellerMiddleware(), compControllers.Delete)
 	}
 }

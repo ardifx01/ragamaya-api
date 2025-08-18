@@ -5,6 +5,7 @@ const (
 	ErrUnauthorized              = "unauthorized access"
 	ErrBadRequest                = "invalid request body or parameters"
 	ErrForbidden                 = "forbidden access"
+	ErrNotSeller                 = "you are not a seller"
 	ErrNotFound                  = "record not found"
 	ErrInternalServer            = "something went wrong"
 	ErrEmailNotVerified          = "email not verified"

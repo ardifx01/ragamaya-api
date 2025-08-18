@@ -3,10 +3,10 @@ package middleware
 import (
 	"net/http"
 	"os"
-	"strings"
 	"ragamaya-api/api/users/dto"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -53,9 +53,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		user := dto.UserOutput{
-			UUID:  claims["uuid"].(string),
-			Email: claims["email"].(string),
-			Name:  claims["name"].(string),
+			UUID:            claims["uuid"].(string),
+			Email:           claims["email"].(string),
+			IsEmailVerified: claims["is_email_verified"].(bool),
+			SUB:             claims["sub"].(string),
+			Name:            claims["name"].(string),
+			Role:            dto.Roles(claims["role"].(string)),
+			AvatarURL:       claims["avatar_url"].(string),
 		}
 
 		c.Set("user", user)

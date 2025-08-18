@@ -23,8 +23,11 @@ type Users struct {
 	SUB             string `gorm:"not null;unique;index"`
 	Name            string `gorm:"not null"`
 	Role            Roles  `gorm:"not null;default:user"`
+	AvatarURL       string
 
 	CreatedAt time.Time  `gorm:"not null"`
 	UpdatedAt time.Time  `gorm:"not null"`
 	DeletedAt *time.Time `gorm:"index"`
+
+	SellerProfile Sellers `gorm:"foreignKey:UserUUID;references:UUID"`
 }

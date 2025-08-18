@@ -8,8 +8,8 @@ import (
 )
 
 func MapUserMTO(input models.Users) dto.UserOutput {
-	var user dto.UserOutput
+	var output dto.UserOutput
 
-	mapstructure.Decode(input, &user)
-	return user
+	mapstructure.Decode(input, &output)
+	return output
 }

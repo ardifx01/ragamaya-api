@@ -100,6 +100,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 	claims["sub"] = user.SUB
 	claims["name"] = user.Name
 	claims["role"] = user.Role
+	claims["avatar_url"] = user.AvatarURL
 	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 	accessTokenStr, signErr := token.SignedString([]byte(jwtSecret))
 	if signErr != nil {
@@ -147,6 +148,7 @@ func (s *CompServicesImpl) RefreshToken(ctx *gin.Context, refreshToken string) (
 	claims["sub"] = user.SUB
 	claims["name"] = user.Name
 	claims["role"] = user.Role
+	claims["avatar_url"] = user.AvatarURL
 	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 	accessTokenStr, signErr := token.SignedString([]byte(jwtSecret))
 	if signErr != nil {

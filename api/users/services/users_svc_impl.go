@@ -82,6 +82,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 				SUB:             googleData.Sub,
 				Name:            googleData.Name,
 				Role:            "user",
+				AvatarURL:       googleData.Picture,
 			}
 			if err := s.repo.Create(ctx, s.DB, *user); err != nil {
 				return nil, err

@@ -48,6 +48,10 @@ func (s *CompServicesImpl) Register(ctx *gin.Context, data dto.RegisterReq) *exc
 	input.UUID = uuid.NewString()
 	input.UserUUID = userData.UUID
 
+	if input.AvatarURL == "" {
+		input.AvatarURL = userData.AvatarURL
+	}
+
 	tx := s.DB.Begin()
 	defer helpers.CommitOrRollback(tx)
 

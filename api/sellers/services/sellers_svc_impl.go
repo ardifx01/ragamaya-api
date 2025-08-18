@@ -67,3 +67,80 @@ func (s *CompServicesImpl) Register(ctx *gin.Context, data dto.RegisterReq) *exc
 
 	return nil
 }
+
+func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.SellerRes, *exceptions.Exception) {
+	result, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapSellerMTO(*result)
+	return &output, nil
+}
+
+func (s *CompServicesImpl) FindByUserUUID(ctx *gin.Context, uuid string) (*dto.SellerRes, *exceptions.Exception) {
+	result, err := s.repo.FindByUserUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapSellerMTO(*result)
+	return &output, nil
+}
+
+func (s *CompServicesImpl) Update(ctx *gin.Context, data dto.UpdateReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	sellerData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	if err != nil {
+		return err
+	}
+
+	input := mapper.MapSellerUTM(data)
+	input.UUID = sellerData.UUID
+
+	err = s.repo.Update(ctx, tx, input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CompServicesImpl) Delete(ctx *gin.Context) *exceptions.Exception {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	sellerData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.Delete(ctx, tx, sellerData.UUID)
+	if err != nil {
+		return err
+	}
+
+	err = s.userRepo.Update(ctx, tx, models.Users{
+		UUID: userData.UUID,
+		Role: models.User,
+	})
+
+	return nil
+}

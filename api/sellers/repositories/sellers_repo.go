@@ -10,4 +10,8 @@ import (
 
 type CompRepositories interface {
 	Create(ctx *gin.Context, tx *gorm.DB, data models.Sellers) *exceptions.Exception
+	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Sellers, *exceptions.Exception)
+	FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Sellers, *exceptions.Exception)
+	Update(ctx *gin.Context, tx *gorm.DB, data models.Sellers) *exceptions.Exception
+	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 }

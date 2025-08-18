@@ -9,4 +9,8 @@ import (
 
 type CompServices interface {
 	Register(ctx *gin.Context, data dto.RegisterReq) *exceptions.Exception
+	FindByUUID(ctx *gin.Context, uuid string) (*dto.SellerRes, *exceptions.Exception)
+	FindByUserUUID(ctx *gin.Context, uuid string) (*dto.SellerRes, *exceptions.Exception)
+	Update(ctx *gin.Context, data dto.UpdateReq) *exceptions.Exception
+	Delete(ctx *gin.Context) *exceptions.Exception
 }

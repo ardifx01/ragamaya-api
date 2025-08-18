@@ -28,7 +28,6 @@ import (
 	"os/signal"
 	"ragamaya-api/docs"
 	"ragamaya-api/pkg/config"
-	"ragamaya-api/pkg/logger"
 	"ragamaya-api/pkg/middleware"
 	"ragamaya-api/routers"
 	"syscall"
@@ -51,7 +50,6 @@ func main() {
 	config.InitEnvCheck()
 	helpers.InitRedis()
 
-	logger.Startup()
 	port := os.Getenv("PORT")
 	environment := os.Getenv("ENVIRONMENT")
 

@@ -92,7 +92,7 @@ func RequestResponseLogger() gin.HandlerFunc {
 		start := time.Now()
 
 		var reqBody []byte
-		
+
 		contentType := c.GetHeader("Content-Type")
 		if c.Request.Body != nil && !strings.HasPrefix(contentType, "multipart/") {
 			bodyBytes, _ := ioutil.ReadAll(io.LimitReader(c.Request.Body, 1024))
@@ -100,17 +100,14 @@ func RequestResponseLogger() gin.HandlerFunc {
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
-		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
-		c.Writer = blw
-
 		c.Next()
 
 		duration := time.Since(start)
 		status := c.Writer.Status()
 
 		log.Printf("[REQ] %s %s | Body: %s", colorMethod(c.Request.Method), c.Request.URL.Path, truncateForLog(reqBody))
-		log.Printf("[RES] %s %s | Status: %s | Duration: %v | Body: %s",
-			colorMethod(c.Request.Method), c.Request.URL.Path, colorStatus(status), duration, truncateForLog(blw.body.Bytes()))
+		log.Printf("[RES] %s %s | Status: %s | Duration: %v",
+			colorMethod(c.Request.Method), c.Request.URL.Path, colorStatus(status), duration)
 	}
 }
 

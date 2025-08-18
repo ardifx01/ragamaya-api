@@ -101,7 +101,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 	claims["name"] = user.Name
 	claims["role"] = user.Role
 	claims["avatar_url"] = user.AvatarURL
-	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 10).Unix()
 	accessTokenStr, signErr := token.SignedString([]byte(jwtSecret))
 	if signErr != nil {
 		return nil, exceptions.NewException(500, "Failed to generate access token")
@@ -149,7 +149,7 @@ func (s *CompServicesImpl) RefreshToken(ctx *gin.Context, refreshToken string) (
 	claims["name"] = user.Name
 	claims["role"] = user.Role
 	claims["avatar_url"] = user.AvatarURL
-	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 10).Unix()
 	accessTokenStr, signErr := token.SignedString([]byte(jwtSecret))
 	if signErr != nil {
 		return "", exceptions.NewException(500, "Failed to generate access token")

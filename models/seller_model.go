@@ -16,6 +16,7 @@ type Sellers struct {
 	Name      string `gorm:"not null"`
 	Desc      string `gorm:"not null"`
 	Address   string `gorm:"not null"`
+	Whatsapp  string `gorm:"not null;unique"`
 	AvatarURL string
 
 	CreatedAt time.Time

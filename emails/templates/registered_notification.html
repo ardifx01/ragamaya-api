@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selamat Datang di Ragamaya</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 300;
+      }
+      .header p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      .content {
+        padding: 40px 30px;
+      }
+      .greeting {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+      .message {
+        font-size: 16px;
+        margin-bottom: 30px;
+        color: #555;
+      }
+      .info-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 25px;
+        margin: 30px 0;
+        border-left: 4px solid #667eea;
+      }
+      .info-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(108, 117, 125, 0.1);
+      }
+      .info-row:last-child {
+        border-bottom: none;
+      }
+      .info-label {
+        font-weight: 500;
+        color: #495057;
+        font-size: 15px;
+      }
+      .info-value {
+        font-weight: 600;
+        color: #212529;
+        text-align: right;
+        font-size: 15px;
+        max-width: 60%;
+        word-break: break-word;
+      }
+      .dashboard-button {
+        text-align: center;
+        margin: 30px 0;
+      }
+      .dashboard-button a {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+      .dashboard-button a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+      .next-steps {
+        background-color: #e7f3ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+        border-left: 4px solid #007bff;
+      }
+      .next-steps h3 {
+        color: #007bff;
+        margin: 0 0 15px 0;
+        font-size: 16px;
+      }
+      .next-steps ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .next-steps li {
+        margin-bottom: 8px;
+        color: #495057;
+        font-size: 15px;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        color: #856404;
+        font-size: 14px;
+      }
+      .footer {
+        background-color: #f8f9fa;
+        padding: 20px 30px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        border-top: 1px solid #e9ecef;
+      }
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+      }
+      .divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        margin: 30px 0;
+      }
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        .content {
+          padding: 30px 20px;
+        }
+        .header {
+          padding: 20px;
+        }
+        .header h1 {
+          font-size: 24px;
+        }
+        .info-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+        .info-value {
+          text-align: left;
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Ragamaya</h1>
+        <p>Pendaftaran Seller Berhasil</p>
+      </div>
+
+      <div class="content">
+        <div class="greeting">Halo {{.SellerName}},</div>
+
+        <div class="message">
+          Selamat! Pendaftaran Anda sebagai seller di
+          <strong>Ragamaya</strong> telah berhasil. Kami sangat senang menyambut
+          Anda bergabung dengan komunitas seller kami.
+        </div>
+
+        <div class="message">Berikut adalah detail pendaftaran Anda:</div>
+
+        <!-- Registration Details -->
+        <div class="info-section">
+          <div class="info-title">
+            <span>📋</span>
+            Detail Pendaftaran
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Nama Seller</span>
+            <span class="info-value">{{.SellerName}}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Nama Toko</span>
+            <span class="info-value">{{.StoreName}}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Alamat</span>
+            <span class="info-value">{{.Address}}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Tanggal Daftar</span>
+            <span class="info-value"
+              >{{.CreatedAt.Format "2 January 2006, 15:04"}}</span
+            >
+          </div>
+        </div>
+
+        <div class="dashboard-button">
+          <a href="#" target="_blank"> 🚀 Akses Dashboard Seller </a>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+          <h3>📝 Langkah Selanjutnya</h3>
+          <ul>
+            <li>Lengkapi profil toko Anda dengan logo dan deskripsi</li>
+            <li>Upload produk pertama Anda ke marketplace</li>
+            <li>Atur metode pengiriman dan pembayaran</li>
+            <li>Pelajari panduan seller untuk memaksimalkan penjualan</li>
+          </ul>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="warning">
+          <strong>Catatan Penting:</strong> Mohon simpan email ini sebagai bukti
+          pendaftaran. Akun seller Anda akan segera diverifikasi oleh tim kami
+          dalam 1-2 hari kerja.
+        </div>
+
+        <div class="message">
+          Tim support kami siap membantu Anda dalam perjalanan menjadi seller
+          sukses di Ragamaya. Jangan ragu untuk menghubungi kami jika ada
+          pertanyaan.
+        </div>
+
+        <div class="message">
+          Terima kasih telah mempercayai Ragamaya sebagai platform jual beli
+          Anda.
+        </div>
+
+        <div class="message" style="margin-top: 30px">
+          Salam hangat,<br />
+          <strong>Tim Ragamaya</strong>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>
+          Butuh bantuan? Hubungi tim support kami di
+          <a href="mailto:seller-support@ragamaya.com"
+            >seller-support@ragamaya.com</a
+          >
+        </p>
+        <p>© 2025 Ragamaya. Semua hak dilindungi undang-undang.</p>
+      </div>
+    </div>
+  </body>
+</html>

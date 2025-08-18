@@ -22,3 +22,19 @@ type Sellers struct {
 	UpdatedAt time.Time
 	DeletedAt *time.Time `gorm:"null;default:null"`
 }
+
+type SellerJWTPayload struct {
+	UUID      string `json:"uuid"`
+	UserUUID  string `json:"user_uuid"`
+	Name      string `json:"name"`
+	AvatarURL string `json:"avatar_url"`
+}
+
+func (s *Sellers) ToJWTPayload() SellerJWTPayload {
+	return SellerJWTPayload{
+		UUID:      s.UUID,
+		UserUUID:  s.UserUUID,
+		Name:      s.Name,
+		AvatarURL: s.AvatarURL,
+	}
+}

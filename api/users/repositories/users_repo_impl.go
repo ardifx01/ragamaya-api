@@ -26,7 +26,7 @@ func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models
 
 func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Users, *exceptions.Exception) {
 	var user models.Users
-	err := tx.Where("uuid = ?", uuid).First(&user).Error
+	err := tx.Where("uuid = ?", uuid).Preload("SellerProfile").First(&user).Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}
@@ -35,7 +35,7 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 
 func (r *CompRepositoriesImpl) FindByEmail(ctx *gin.Context, tx *gorm.DB, email string) (*models.Users, *exceptions.Exception) {
 	var user models.Users
-	err := tx.Where("email = ?", email).First(&user).Error
+	err := tx.Where("email = ?", email).Preload("SellerProfile").First(&user).Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}

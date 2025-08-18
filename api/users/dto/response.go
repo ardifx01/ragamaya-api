@@ -26,4 +26,16 @@ type UserOutput struct {
 	Name            string `json:"name"`
 	Role            Roles  `json:"role"`
 	AvatarURL       string `json:"avatar_url"`
+
+	SellerProfile SellerRes `json:"seller_profile,omitempty"`
+}
+
+type SellerRes struct {
+	UUID      string `json:"uuid"`
+	UserUUID  string `json:"user_uuid"`
+	Name      string `json:"name"`
+	Desc      string `json:"desc"`
+	Address   string `json:"address"`
+	AvatarURL string `json:"avatar_url"`
+	CreatedAt string `json:"created_at"`
 }

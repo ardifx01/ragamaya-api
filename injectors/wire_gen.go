@@ -40,7 +40,8 @@ func InitializeStorageController(db *gorm.DB, s3client *s3.Client, validate *val
 
 func InitializeSellerController(db *gorm.DB, validate *validator.Validate) controllers3.CompControllers {
 	compRepositories := repositories3.NewComponentRepository()
-	compServices := services3.NewComponentServices(compRepositories, db, validate)
+	repositoriesCompRepositories := repositories.NewComponentRepository()
+	compServices := services3.NewComponentServices(compRepositories, db, validate, repositoriesCompRepositories)
 	compControllers := controllers3.NewCompController(compServices)
 	return compControllers
 }
@@ -51,4 +52,4 @@ var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.N
 
 var storageFeatureSet = wire.NewSet(repositories2.NewComponentRepository, services2.NewComponentServices, controllers2.NewCompController)
 
-var sellerFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController)
+var sellerFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController, repositories.NewComponentRepository)

@@ -40,6 +40,8 @@ var sellerFeatureSet = wire.NewSet(
 	sellerRepositories.NewComponentRepository,
 	sellerServices.NewComponentServices,
 	sellerControllers.NewCompController,
+	
+	userRepositories.NewComponentRepository,
 )
 
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {

@@ -26,7 +26,12 @@ func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models
 
 func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Products, *exceptions.Exception) {
 	var seller models.Products
-	err := tx.Where("uuid = ?", uuid).First(&seller).Error
+	err := tx.
+		Where("uuid = ?", uuid).
+		Preload("Thumbnails").
+		Preload("DigitalFiles").
+		First(&seller).
+		Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}

@@ -107,6 +107,23 @@ func SellerMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		if dto.Roles(claims["role"].(string)) != dto.Seller {
+			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrNotSeller))
+			return
+		}
+
+		sellerProfileInterface, ok := claims["seller_profile"]
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrNotSeller))
+			return
+		}
+
+		sellerProfile, ok := sellerProfileInterface.(map[string]interface{})
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrInvalidCredentials))
+			return
+		}
+
 		user := dto.UserOutput{
 			UUID:            claims["uuid"].(string),
 			Email:           claims["email"].(string),
@@ -115,13 +132,12 @@ func SellerMiddleware() gin.HandlerFunc {
 			Name:            claims["name"].(string),
 			Role:            dto.Roles(claims["role"].(string)),
 			AvatarURL:       claims["avatar_url"].(string),
+			SellerProfile: dto.SellerRes{
+				UUID:      sellerProfile["uuid"].(string),
+				Name:      sellerProfile["name"].(string),
+				AvatarURL: sellerProfile["avatar_url"].(string),
+			},
 		}
-
-		if user.Role != dto.Seller {
-			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrNotSeller))
-			return
-		}
-
 		c.Set("user", user)
 		c.Next()
 	}

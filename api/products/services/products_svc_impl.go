@@ -4,6 +4,7 @@ import (
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/repositories"
 	"ragamaya-api/pkg/exceptions"
+	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
 
 	"github.com/gin-gonic/gin"
@@ -31,9 +32,15 @@ func (s *CompServicesImpl) Register(ctx *gin.Context, data dto.RegisterReq) *exc
 	if validateErr != nil {
 		return exceptions.NewValidationException(validateErr)
 	}
+	
+		sellerData, err := helpers.GetUserData(ctx)
+		if err != nil {
+			return err
+		}
 
 	input := mapper.MapProductITM(data)
 	input.UUID = uuid.NewString()
+	input.SellerUUID = sellerData.SellerProfile.UUID
 
 	result := s.repo.Create(ctx, s.DB, input)
 	if result != nil {

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"net/http"
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/repositories"
 	"ragamaya-api/pkg/exceptions"
@@ -32,11 +33,11 @@ func (s *CompServicesImpl) Register(ctx *gin.Context, data dto.RegisterReq) *exc
 	if validateErr != nil {
 		return exceptions.NewValidationException(validateErr)
 	}
-	
-		sellerData, err := helpers.GetUserData(ctx)
-		if err != nil {
-			return err
-		}
+
+	sellerData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
 
 	input := mapper.MapProductITM(data)
 	input.UUID = uuid.NewString()
@@ -61,6 +62,20 @@ func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.Produ
 }
 
 func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
+	productData, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return err
+	}
+
+	sellerData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	if productData.SellerUUID != sellerData.SellerProfile.UUID {
+		return exceptions.NewException(http.StatusForbidden, exceptions.ErrNotTheOwner)
+	}
+
 	result := s.repo.Delete(ctx, s.DB, uuid)
 	if result != nil {
 		return result

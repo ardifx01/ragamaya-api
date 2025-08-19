@@ -12,6 +12,6 @@ func ProductRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 	{
 		productGroup.GET("/:uuid", compControllers.FindByUUID)
 		productGroup.POST("/register", middleware.SellerMiddleware(), compControllers.Register)
-		productGroup.DELETE("/delete", middleware.SellerMiddleware(), compControllers.Delete)
+		productGroup.DELETE("/delete/:uuid", middleware.SellerMiddleware(), compControllers.Delete)
 	}
 }

@@ -28,4 +28,5 @@ const (
 	ErrInvalidDate               = "invalid date"
 	ErrInvalidTokenStructure     = "invalid token structure"
 	ErrDataNotVerified           = "data not verified"
+	ErrNotTheOwner               = "you are not the owner of this resource"
 )

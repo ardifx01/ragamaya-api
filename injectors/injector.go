@@ -17,6 +17,10 @@ import (
 	sellerControllers "ragamaya-api/api/sellers/controllers"
 	sellerRepositories "ragamaya-api/api/sellers/repositories"
 	sellerServices "ragamaya-api/api/sellers/services"
+	
+	productControllers "ragamaya-api/api/products/controllers"
+	productRepositories "ragamaya-api/api/products/repositories"
+	productServices "ragamaya-api/api/products/services"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
@@ -44,6 +48,12 @@ var sellerFeatureSet = wire.NewSet(
 	userRepositories.NewComponentRepository,
 )
 
+var productFeatureSet = wire.NewSet(
+	productRepositories.NewComponentRepository,
+	productServices.NewComponentServices,
+	productControllers.NewCompController,
+)
+
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
 	wire.Build(userFeatureSet)
 	return nil
@@ -56,5 +66,10 @@ func InitializeStorageController(db *gorm.DB, s3client *s3.Client, validate *val
 
 func InitializeSellerController(db *gorm.DB, validate *validator.Validate) sellerControllers.CompControllers {
 	wire.Build(sellerFeatureSet)
+	return nil
+}
+
+func InitializeProductController(db *gorm.DB, validate *validator.Validate) productControllers.CompControllers {
+	wire.Build(productFeatureSet)
 	return nil
 }

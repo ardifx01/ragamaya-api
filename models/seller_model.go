@@ -19,9 +19,9 @@ type Sellers struct {
 	Whatsapp  string `gorm:"not null;unique"`
 	AvatarURL string
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time `gorm:"null;default:null"`
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
+	DeletedAt *time.Time `gorm:"index"`
 }
 
 type SellerJWTPayload struct {

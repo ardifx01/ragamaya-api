@@ -26,8 +26,10 @@ func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *
 	userController := injectors.InitializeUserController(db, validate)
 	storageController := injectors.InitializeStorageController(db, storage, validate)
 	sellerController := injectors.InitializeSellerController(db, validate)
+	productController := injectors.InitializeProductController(db, validate)
 
 	UserRoutes(r, userController)
 	StorageRoutes(r, storageController)
 	SellerRoutes(r, sellerController)
+	ProductRoutes(r, productController)
 }

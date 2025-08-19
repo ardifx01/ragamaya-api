@@ -16,6 +16,9 @@ func main() {
 		&models.BlacklistedToken{},
 		&models.VerificationToken{},
 		&models.Files{},
+		&models.Products{},
+		&models.ProductThumbnails{},
+		&models.ProductDigitalFiles{},
 	)
 	if err != nil {
 		panic("failed to migrate models: " + err.Error())

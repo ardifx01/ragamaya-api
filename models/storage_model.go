@@ -19,7 +19,7 @@ type Files struct {
 	MimeSubType      string
 	Meta             string `gorm:"not null"`
 	
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	DeletedAt        *time.Time `gorm:"null;default:null"`
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
+	DeletedAt *time.Time `gorm:"index"`
 }

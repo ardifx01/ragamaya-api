@@ -11,6 +11,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"gorm.io/gorm"
+	controllers4 "ragamaya-api/api/products/controllers"
+	repositories4 "ragamaya-api/api/products/repositories"
+	services4 "ragamaya-api/api/products/services"
 	controllers3 "ragamaya-api/api/sellers/controllers"
 	repositories3 "ragamaya-api/api/sellers/repositories"
 	services3 "ragamaya-api/api/sellers/services"
@@ -46,6 +49,13 @@ func InitializeSellerController(db *gorm.DB, validate *validator.Validate) contr
 	return compControllers
 }
 
+func InitializeProductController(db *gorm.DB, validate *validator.Validate) controllers4.CompControllers {
+	compRepositories := repositories4.NewComponentRepository()
+	compServices := services4.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers4.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
 var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController)
@@ -53,3 +63,5 @@ var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.N
 var storageFeatureSet = wire.NewSet(repositories2.NewComponentRepository, services2.NewComponentServices, controllers2.NewCompController)
 
 var sellerFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController, repositories.NewComponentRepository)
+
+var productFeatureSet = wire.NewSet(repositories4.NewComponentRepository, services4.NewComponentServices, controllers4.NewCompController)

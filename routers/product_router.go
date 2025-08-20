@@ -10,6 +10,7 @@ import (
 func ProductRoutes(r *gin.RouterGroup, compControllers controllers.CompControllers) {
 	productGroup := r.Group("/product")
 	{
+		productGroup.GET("/search", compControllers.Search)
 		productGroup.GET("/:uuid", compControllers.FindByUUID)
 		productGroup.POST("/register", middleware.SellerMiddleware(), compControllers.Register)
 		productGroup.DELETE("/delete/:uuid", middleware.SellerMiddleware(), compControllers.Delete)

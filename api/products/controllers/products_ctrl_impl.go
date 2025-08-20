@@ -5,6 +5,7 @@ import (
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/services"
 	"ragamaya-api/pkg/exceptions"
+	"ragamaya-api/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,5 +66,27 @@ func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Response{
 		Status:  http.StatusOK,
 		Message: "delete success",
+	})
+}
+
+func (h *CompControllersImpl) Search(ctx *gin.Context) {
+	var data dto.ProductSearchReq
+	if err := ctx.ShouldBindQuery(&data); err != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	logger.Info("Search: ", data)
+
+	result, err := h.services.Search(ctx, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    result,
 	})
 }

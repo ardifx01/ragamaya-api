@@ -83,3 +83,23 @@ func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exc
 
 	return nil
 }
+
+func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.ProductSearchReq) ([]dto.ProductRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	product, _, err := s.repo.Search(ctx, s.DB, data)
+	if err != nil {
+		return nil, err
+	}
+
+	var output []dto.ProductRes
+
+	for _, item := range product {
+		output = append(output, mapper.MapProductMTO(item))
+	}
+
+	return output, nil
+}

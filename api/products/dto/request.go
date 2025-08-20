@@ -28,3 +28,13 @@ type ProductDigitalFiles struct {
 	Description string `json:"description" validate:"required"`
 	Extension   string `json:"extension" validate:"required"`
 }
+
+type ProductSearchReq struct {
+	Keyword     *string      `form:"keyword" validate:"omitempty"`
+	PriceMin    *uint        `form:"price_min" validate:"omitempty,gte=1"`
+	PriceMax    *uint        `form:"price_max" validate:"omitempty,gte=1"`
+	ProductType *ProductType `form:"product_type" validate:"omitempty,oneof=digital physical"`
+	Page        *int         `form:"page" validate:"omitempty,gte=1"`
+	PageSize    *int         `form:"page_size" validate:"omitempty,gte=1,lte=100"`
+	SellerUUID  *string      `form:"seller_uuid" validate:"omitempty,uuid4"`
+}

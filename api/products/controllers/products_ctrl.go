@@ -6,4 +6,5 @@ type CompControllers interface {
 	Register(ctx *gin.Context)
 	FindByUUID(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	Search(ctx *gin.Context)
 }

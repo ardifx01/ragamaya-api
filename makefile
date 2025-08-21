@@ -48,6 +48,10 @@ wire:
 wire-internal:
 	wire gen ./internal/injectors
 
+# Generate wire dependencies for midtrans
+wire-midtrans:
+	wire gen ./midtrans/injectors
+
 # Generate Swagger documentation
 swagger:
 	swag init -g cmd/server/main.go -o docs --parseDependency --parseInternal

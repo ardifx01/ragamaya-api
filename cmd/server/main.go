@@ -13,6 +13,7 @@ import (
 	"time"
 
 	internalRouters "ragamaya-api/internal/routers"
+	midtransRouters "ragamaya-api/midtrans/routers"
 	"ragamaya-api/pkg/helpers"
 
 	"github.com/didip/tollbooth/v7"
@@ -44,6 +45,7 @@ func main() {
 
 	db := config.InitDB()
 	storage := config.InitStorage()
+	midtransCore := config.InitMidtrans()
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	lmt := tollbooth.NewLimiter(5, &limiter.ExpirableOptions{DefaultExpirationTTL: time.Second})
 
@@ -53,6 +55,9 @@ func main() {
 
 	internal := r.Group("/internal")
 	internalRouters.InternalRouters(internal, db, validate)
+
+	midtrans := r.Group("/midtrans")
+	midtransRouters.MidtransRouters(midtrans, db, validate, midtransCore)
 
 	api := r.Group("/api")
 	routers.CompRouters(api, db, storage, validate)

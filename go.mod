@@ -18,6 +18,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/midtrans/midtrans-go v1.3.8
 	github.com/mssola/user_agent v0.6.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/text v0.28.0

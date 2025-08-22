@@ -2,8 +2,10 @@ package helpers
 
 import (
 	"fmt"
+	"ragamaya-api/pkg/exceptions"
 	"time"
 
+	"github.com/midtrans/midtrans-go"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -24,4 +26,8 @@ func FormatIndonesianTime(time time.Time) string {
 func FormatIndonesianLocaleString(value uint) string {
 	p := message.NewPrinter(language.Indonesian)
 	return p.Sprintf("%d", value)
+}
+
+func FormatMidtransErrorToException(err *midtrans.Error) *exceptions.Exception {
+	return exceptions.NewException(err.StatusCode, err.Message)
 }

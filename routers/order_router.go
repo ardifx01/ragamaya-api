@@ -13,7 +13,7 @@ func OrderRoutes(r *gin.RouterGroup, orderController controllers.CompControllers
 	{
 		orderGroup.POST("/create/:payment_type", orderController.Create)
 		orderGroup.GET("/stream", orderController.StreamInfo)
-		// orderGroup.GET("/get", orderController.FindByUUID)
-		// orderGroup.GET("/getall", orderController.FindByUserUUID)
+		orderGroup.GET("/:uuid", orderController.FindByUUID)
+		orderGroup.GET("/getall", orderController.FindByUserUUID)
 	}
 }

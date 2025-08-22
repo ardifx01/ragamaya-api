@@ -98,3 +98,32 @@ func (h *CompControllersImpl) StreamInfo(ctx *gin.Context) {
 		}
 	}
 }
+
+func (h *CompControllersImpl) FindByUUID(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	data, err := h.services.FindByUUID(ctx, uuid)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}
+
+func (h *CompControllersImpl) FindByUserUUID(ctx *gin.Context) {
+	data, err := h.services.FindByUserUUID(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}

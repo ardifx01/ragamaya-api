@@ -12,9 +12,11 @@ type OrderRes struct {
 	UUID        string `json:"uuid"`
 	UserUUID    string `json:"user_uuid"`
 	ProductUUID string `json:"product_uuid"`
-	Quantity    string `json:"quantity"`
-	Amount      string `json:"amount"`
+	Quantity    int    `json:"quantity"`
+	GrossAmt    int64  `json:"amount"`
 	Status      string `json:"status"`
+	
+	Payments []OrderPaymentRes `json:"payments,omitempty"`
 }
 
 type OrderChargeRes struct {
@@ -22,8 +24,8 @@ type OrderChargeRes struct {
 	UserUUID    string    `json:"user_uuid,omitempty"`
 	ProductUUID string    `json:"product_uuid,omitempty"`
 	Status      string    `json:"status,omitempty"`
-	Quantity    uint      `json:"quantity,omitempty"`
-	GrossAmt    uint      `json:"gross_amount,omitempty"`
+	Quantity    int       `json:"quantity,omitempty"`
+	GrossAmt    int64     `json:"gross_amount,omitempty"`
 	PaymentType string    `json:"payment_type,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`

@@ -26,7 +26,8 @@ func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models
 
 func (r *CompRepositoriesImpl) FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.Orders, *exceptions.Exception) {
 	var order []models.Orders
-	err := tx.Where("user_uuid = ?", uuid).Find(&order).Error
+	err := tx.
+		Where("user_uuid = ?", uuid).Find(&order).Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}

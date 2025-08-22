@@ -270,3 +270,43 @@ func (s *CompServicesImpl) SendStreamEvent(ctx *gin.Context, orderUUID string, d
 		}
 	}
 }
+
+func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.OrderRes, *exceptions.Exception) {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	orderData, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	if orderData.UserUUID != userData.UUID {
+		return nil, exceptions.NewException(http.StatusForbidden, exceptions.ErrForbidden)
+	}
+
+	output := mapper.MapOrderMTO(*orderData)
+
+	return &output, nil
+}
+
+func (s *CompServicesImpl) FindByUserUUID(ctx *gin.Context) ([]dto.OrderRes, *exceptions.Exception) {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	orderData, err := s.repo.FindByUserUUID(ctx, s.DB, userData.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.OrderRes
+	for _, order := range orderData {
+		output := mapper.MapOrderMTO(order)
+		result = append(result, output)
+	}
+
+	return result, nil
+}

@@ -1,17 +1,27 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"ragamaya-api/api/orders/dto"
 	"ragamaya-api/api/orders/repositories"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
+	"strconv"
+	"time"
 
+	paymentRepo "ragamaya-api/api/payments/repositories"
+	productRepo "ragamaya-api/api/products/repositories"
 	userDTO "ragamaya-api/api/users/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
@@ -22,19 +32,121 @@ type CompServicesImpl struct {
 	DB           *gorm.DB
 	validate     *validator.Validate
 	midtransCore *coreapi.Client
+	paymentRepo  paymentRepo.CompRepositories
+	productRepo  productRepo.CompRepositories
 }
 
-func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) CompServices {
+func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client, paymentRepo paymentRepo.CompRepositories, productRepo productRepo.CompRepositories) CompServices {
 	return &CompServicesImpl{
 		repo:         compRepositories,
 		DB:           db,
 		validate:     validate,
 		midtransCore: midtransCore,
+		paymentRepo:  paymentRepo,
+		productRepo:  productRepo,
 	}
 }
 
-func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.OrderReq) {
+func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.OrderReq) (*dto.OrderChargeRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
 
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	order, err := s.prepareOrder(ctx, tx, data, &userData)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repo.Create(ctx, tx, *order)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.productRepo.DecrementStockByUUID(ctx, tx, data.ProductUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	if order.GrossAmt == 0 {
+		err = s.processFreePayment(ctx, tx, order, &userData)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = s.processPayment(ctx, tx, order, &userData)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	orderResult, err := s.repo.FindByUUID(ctx, tx, order.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapOrderModelToChargeOutput(*orderResult)
+
+	return &output, nil
+}
+
+func (s *CompServicesImpl) prepareOrder(ctx *gin.Context, tx *gorm.DB, data dto.OrderReq, userData *userDTO.UserOutput) (*models.Orders, *exceptions.Exception) {
+	productData, err := s.productRepo.FindByUUID(ctx, tx, data.ProductUUID)
+	if err != nil {
+		return nil, err
+	}
+
+	if productData.ProductType == models.Digital {
+		data.Quantity = 1
+	}
+
+	err = s.validateOrderQuantity(data.Quantity, productData)
+	if err != nil {
+		return nil, err
+	}
+
+	order := mapper.MapOrderITM(data)
+	order.UUID = uuid.NewString()
+	order.UserUUID = userData.UUID
+	order.ProductUUID = productData.UUID
+	order.Status = "pending"
+
+	if productData.Price > 0 {
+		serviceFee := 0
+		if os.Getenv("ORDER_SERVICE_FEE") != "" {
+			serviceFeeEnv, exc := strconv.Atoi(os.Getenv("ORDER_SERVICE_FEE"))
+			if exc != nil {
+				return nil, exceptions.NewException(http.StatusInternalServerError, exc.Error())
+			}
+
+			serviceFee = serviceFeeEnv
+		}
+
+		order.GrossAmt = (productData.Price * int64(data.Quantity)) + int64(serviceFee)
+	} else {
+		order.GrossAmt = 0
+		order.PaymentType = "free"
+	}
+
+	return &order, nil
+}
+
+func (s *CompServicesImpl) validateOrderQuantity(quantity int, ticketCategory *models.Products) *exceptions.Exception {
+	if quantity > ticketCategory.Stock {
+		return exceptions.NewException(http.StatusBadRequest, exceptions.ErrCheckoutQuantityMoreThanStocks)
+	}
+	if quantity > ticketCategory.Stock {
+		return exceptions.NewException(http.StatusBadRequest, exceptions.ErrCheckoutQuantityMoreThanAllowed)
+	}
+	return nil
 }
 
 func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserOutput) *exceptions.Exception {
@@ -51,10 +163,38 @@ func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *
 	payment.UserUUID = userData.UUID
 	payment.ProductUUID = order.ProductUUID
 
-	// err := s.paymentRepo.Create(ctx, tx, payment)
-	// if err != nil {
-	// 	return err
-	// }
+	err := s.paymentRepo.Create(ctx, tx, payment)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *CompServicesImpl) processFreePayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserOutput) *exceptions.Exception {
+	var data models.Payments
+
+	data.UUID = uuid.NewString()
+	data.UserUUID = userData.UUID
+	data.ProductUUID = order.ProductUUID
+	data.OrderUUID = order.UUID
+	data.GrossAmount = 0
+	data.PaymentType = "free"
+	data.TransactionTime = time.Now().UTC().Add(time.Hour * 7).Format("2006-01-02 15:04:05")
+	data.TransactionStatus = "pending"
+	data.FraudStatus = "accept"
+	data.StatusCode = "201"
+	data.StatusMessage = "Free transaction is created"
+	data.Currency = "IDR"
+	data.PointRedeemAmount = 0
+	data.PointRedeemQuantity = 0
+	data.OnUs = false
+	data.ExpiryTime = time.Now().Add(time.Hour * 24).String()
+
+	err := s.paymentRepo.Create(ctx, tx, data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -95,4 +235,36 @@ func (s *CompServicesImpl) createChargeRequest(order *models.Orders, orderUUID s
 	}
 
 	return baseCharge
+}
+
+
+func (s *CompServicesImpl) RemoveStreamClient(ctx *gin.Context, orderUUID string, client dto.StreamClient) {
+	dto.ClientsMutex.Lock()
+	defer dto.ClientsMutex.Unlock()
+
+	newClients := []dto.StreamClient{}
+	for _, c := range dto.Clients[orderUUID] {
+		if c != client {
+			newClients = append(newClients, c)
+		}
+	}
+	dto.Clients[orderUUID] = newClients
+}
+
+func (s *CompServicesImpl) SendStreamEvent(ctx *gin.Context, orderUUID string, data dto.OrderStreamRes) {
+	dto.ClientsMutex.Lock()
+	defer dto.ClientsMutex.Unlock()
+
+	if clients, exists := dto.Clients[orderUUID]; exists {
+		for _, client := range clients {
+			jsonData, _ := json.Marshal(data)
+			_, err := fmt.Fprintf(client.Writer, "data:%s\n\n", jsonData)
+			if err != nil {
+				log.Println(err)
+				s.RemoveStreamClient(ctx, orderUUID, client)
+				continue
+			}
+			client.Flusher.Flush()
+		}
+	}
 }

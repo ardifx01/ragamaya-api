@@ -10,7 +10,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
+	controllers5 "ragamaya-api/api/orders/controllers"
+	repositories5 "ragamaya-api/api/orders/repositories"
+	services5 "ragamaya-api/api/orders/services"
+	controllers6 "ragamaya-api/api/payments/controllers"
+	repositories6 "ragamaya-api/api/payments/repositories"
+	services6 "ragamaya-api/api/payments/services"
 	controllers4 "ragamaya-api/api/products/controllers"
 	repositories4 "ragamaya-api/api/products/repositories"
 	services4 "ragamaya-api/api/products/services"
@@ -56,6 +63,22 @@ func InitializeProductController(db *gorm.DB, validate *validator.Validate) cont
 	return compControllers
 }
 
+func InitializeOrderController(db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) controllers5.CompControllers {
+	compRepositories := repositories5.NewComponentRepository()
+	repositoriesCompRepositories := repositories6.NewComponentRepository()
+	compRepositories2 := repositories4.NewComponentRepository()
+	compServices := services5.NewComponentServices(compRepositories, db, validate, midtransCore, repositoriesCompRepositories, compRepositories2)
+	compControllers := controllers5.NewCompController(compServices)
+	return compControllers
+}
+
+func InitializePaymentController(db *gorm.DB, validate *validator.Validate) controllers6.CompControllers {
+	compRepositories := repositories6.NewComponentRepository()
+	compServices := services6.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers6.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
 var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController)
@@ -65,3 +88,7 @@ var storageFeatureSet = wire.NewSet(repositories2.NewComponentRepository, servic
 var sellerFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController, repositories.NewComponentRepository)
 
 var productFeatureSet = wire.NewSet(repositories4.NewComponentRepository, services4.NewComponentServices, controllers4.NewCompController)
+
+var orderFeatureSet = wire.NewSet(repositories5.NewComponentRepository, services5.NewComponentServices, controllers5.NewCompController, repositories6.NewComponentRepository, repositories4.NewComponentRepository)
+
+var paymentFeatureSet = wire.NewSet(repositories6.NewComponentRepository, services6.NewComponentServices, controllers6.NewCompController)

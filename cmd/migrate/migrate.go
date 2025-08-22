@@ -19,6 +19,10 @@ func main() {
 		&models.Products{},
 		&models.ProductThumbnails{},
 		&models.ProductDigitalFiles{},
+		&models.Orders{},
+		&models.Payments{},
+		&models.PaymentActions{},
+		&models.PaymentVANumbers{},
 	)
 	if err != nil {
 		panic("failed to migrate models: " + err.Error())

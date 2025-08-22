@@ -2,12 +2,14 @@ package repositories
 
 import (
 	"fmt"
+	"net/http"
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CompRepositoriesImpl struct {
@@ -113,4 +115,45 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, searchReq d
 	}
 
 	return products, total, nil
+}
+
+func (r *CompRepositoriesImpl) DecrementStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
+	var product models.Products
+	result := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("uuid = ?", uuid).
+		First(&product)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	if product.Stock == 0 {
+		tx.Rollback()
+		return exceptions.NewException(http.StatusBadRequest, exceptions.ErrCheckoutQuantityMoreThanStocks)
+	}
+
+	result = tx.Model(&product).
+		Update("stock", product.Stock-1)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
+}
+
+func (r *CompRepositoriesImpl) RestoreStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
+	var product models.Products
+	result := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("uuid = ?", uuid).
+		First(&product)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	result = tx.Model(&product).
+		Update("stock", product.Stock+1)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
 }

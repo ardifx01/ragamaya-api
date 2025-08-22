@@ -9,22 +9,31 @@ import (
 	userControllers "ragamaya-api/api/users/controllers"
 	userRepositories "ragamaya-api/api/users/repositories"
 	userServices "ragamaya-api/api/users/services"
-	
+
 	storageControllers "ragamaya-api/api/storages/controllers"
 	storageRepositories "ragamaya-api/api/storages/repositories"
 	storageServices "ragamaya-api/api/storages/services"
-	
+
 	sellerControllers "ragamaya-api/api/sellers/controllers"
 	sellerRepositories "ragamaya-api/api/sellers/repositories"
 	sellerServices "ragamaya-api/api/sellers/services"
-	
+
 	productControllers "ragamaya-api/api/products/controllers"
 	productRepositories "ragamaya-api/api/products/repositories"
 	productServices "ragamaya-api/api/products/services"
 
+	orderControllers "ragamaya-api/api/orders/controllers"
+	orderRepositories "ragamaya-api/api/orders/repositories"
+	orderServices "ragamaya-api/api/orders/services"
+
+	paymentControllers "ragamaya-api/api/payments/controllers"
+	paymentRepositories "ragamaya-api/api/payments/repositories"
+	paymentServices "ragamaya-api/api/payments/services"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +53,7 @@ var sellerFeatureSet = wire.NewSet(
 	sellerRepositories.NewComponentRepository,
 	sellerServices.NewComponentServices,
 	sellerControllers.NewCompController,
-	
+
 	userRepositories.NewComponentRepository,
 )
 
@@ -52,6 +61,21 @@ var productFeatureSet = wire.NewSet(
 	productRepositories.NewComponentRepository,
 	productServices.NewComponentServices,
 	productControllers.NewCompController,
+)
+
+var orderFeatureSet = wire.NewSet(
+	orderRepositories.NewComponentRepository,
+	orderServices.NewComponentServices,
+	orderControllers.NewCompController,
+	
+	paymentRepositories.NewComponentRepository,
+	productRepositories.NewComponentRepository,
+)
+
+var paymentFeatureSet = wire.NewSet(
+	paymentRepositories.NewComponentRepository,
+	paymentServices.NewComponentServices,
+	paymentControllers.NewCompController,
 )
 
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
@@ -71,5 +95,15 @@ func InitializeSellerController(db *gorm.DB, validate *validator.Validate) selle
 
 func InitializeProductController(db *gorm.DB, validate *validator.Validate) productControllers.CompControllers {
 	wire.Build(productFeatureSet)
+	return nil
+}
+
+func InitializeOrderController(db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) orderControllers.CompControllers {
+	wire.Build(orderFeatureSet)
+	return nil
+}
+
+func InitializePaymentController(db *gorm.DB, validate *validator.Validate) paymentControllers.CompControllers {
+	wire.Build(paymentFeatureSet)
 	return nil
 }

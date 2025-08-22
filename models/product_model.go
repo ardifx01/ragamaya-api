@@ -22,7 +22,7 @@ type Products struct {
 	ProductType ProductType `gorm:"not null;index"`
 	Name        string      `gorm:"not null"`
 	Description string      `gorm:"not null"`
-	Price       uint        `gorm:"not null"`
+	Price       int64        `gorm:"not null"`
 	Stock       int         `gorm:"not null"`
 	Keywords    string      `gorm:"not null"`
 

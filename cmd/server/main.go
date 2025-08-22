@@ -60,7 +60,7 @@ func main() {
 	midtransRouters.MidtransRouters(midtrans, db, validate, midtransCore)
 
 	api := r.Group("/api")
-	routers.CompRouters(api, db, storage, validate)
+	routers.CompRouters(api, db, storage, validate, midtransCore)
 
 	var host string
 	switch environment {

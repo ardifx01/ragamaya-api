@@ -16,4 +16,8 @@ type Orders struct {
 	CreatedAt time.Time  `gorm:"not null"`
 	UpdatedAt time.Time  `gorm:"not null"`
 	DeletedAt *time.Time `gorm:"index"`
+
+	Payments []Payments `gorm:"foreignKey:OrderUUID;references:UUID" mapstructure:"payments"`
+	User     Users      `gorm:"foreignKey:UserUUID;references:UUID"`
+	Product  Products   `gorm:"foreignKey:ProductUUID;references:UUID"`
 }

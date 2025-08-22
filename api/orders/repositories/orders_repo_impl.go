@@ -35,10 +35,18 @@ func (r *CompRepositoriesImpl) FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uui
 
 func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Orders, *exceptions.Exception) {
 	var order models.Orders
-	err := tx.Where("uuid = ?", uuid).First(&order).Error
-	if err != nil {
-		return nil, exceptions.ParseGormError(tx, err)
+
+	result := tx.
+		Preload("Payments").
+		Preload("Payments.PaymentActions").
+		Preload("Payments.PaymentVANumbers").
+		Where("uuid = ?", uuid).
+		Order("created_at DESC").
+		First(&order)
+	if result.Error != nil {
+		return nil, exceptions.ParseGormError(tx, result.Error)
 	}
+
 	return &order, nil
 }
 

@@ -15,4 +15,6 @@ type CompRepositories interface {
 	Update(ctx *gin.Context, tx *gorm.DB, data models.Products) *exceptions.Exception
 	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	Search(ctx *gin.Context, tx *gorm.DB, searchReq dto.ProductSearchReq) ([]models.Products, int64, *exceptions.Exception)
+	DecrementStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
+	RestoreStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 }

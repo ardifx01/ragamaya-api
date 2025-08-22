@@ -8,10 +8,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
 )
 
-func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *validator.Validate) {
+func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *validator.Validate, midtransCore *coreapi.Client) {
 	r.GET("/health", func(ctx *gin.Context) {
 		health := helpers.PerformHealthCheck(db)
 
@@ -27,9 +28,11 @@ func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *
 	storageController := injectors.InitializeStorageController(db, storage, validate)
 	sellerController := injectors.InitializeSellerController(db, validate)
 	productController := injectors.InitializeProductController(db, validate)
+	orderController := injectors.InitializeOrderController(db, validate, midtransCore)
 
 	UserRoutes(r, userController)
 	StorageRoutes(r, storageController)
 	SellerRoutes(r, sellerController)
 	ProductRoutes(r, productController)
+	OrderRoutes(r, orderController)
 }

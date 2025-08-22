@@ -150,7 +150,7 @@ func (s *CompServicesImpl) validateOrderQuantity(quantity int, ticketCategory *m
 }
 
 func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserOutput) *exceptions.Exception {
-	chargeReq := s.createChargeRequest(order, order.UUID, userData)
+	chargeReq := s.createChargeRequest(order, userData)
 
 	midtransRes, midtransErr := s.midtransCore.ChargeTransaction(chargeReq)
 	if midtransErr != nil {
@@ -199,7 +199,7 @@ func (s *CompServicesImpl) processFreePayment(ctx *gin.Context, tx *gorm.DB, ord
 	return nil
 }
 
-func (s *CompServicesImpl) createChargeRequest(order *models.Orders, orderUUID string, userData *userDTO.UserOutput) *coreapi.ChargeReq {
+func (s *CompServicesImpl) createChargeRequest(order *models.Orders, userData *userDTO.UserOutput) *coreapi.ChargeReq {
 	baseCharge := &coreapi.ChargeReq{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  order.UUID,
@@ -212,6 +212,9 @@ func (s *CompServicesImpl) createChargeRequest(order *models.Orders, orderUUID s
 		CustomExpiry: &coreapi.CustomExpiry{
 			ExpiryDuration: 30,
 			Unit:           "minute",
+		},
+		ShopeePay: &coreapi.ShopeePayDetails{
+			CallbackUrl: fmt.Sprintf("%s/payments/%s", os.Getenv("FRONTEND_BASE_URL"), order.UUID),
 		},
 	}
 
@@ -236,7 +239,6 @@ func (s *CompServicesImpl) createChargeRequest(order *models.Orders, orderUUID s
 
 	return baseCharge
 }
-
 
 func (s *CompServicesImpl) RemoveStreamClient(ctx *gin.Context, orderUUID string, client dto.StreamClient) {
 	dto.ClientsMutex.Lock()

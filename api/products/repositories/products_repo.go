@@ -17,4 +17,6 @@ type CompRepositories interface {
 	Search(ctx *gin.Context, tx *gorm.DB, searchReq dto.ProductSearchReq) ([]models.Products, int64, *exceptions.Exception)
 	DecrementStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	RestoreStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
+	CreateProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, data models.ProductDigitalOwned) *exceptions.Exception
+	IsProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string, productUUID string) bool
 }

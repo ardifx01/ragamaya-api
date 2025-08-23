@@ -22,7 +22,6 @@ const (
 	ErrFileURL                         = "invalid file URL"
 	ErrRegisteredWithGoogle            = "user already registered with Google"
 	ErrRegisteredWithCredentials       = "user already registered with credentials"
-	ErrAlreadyCheckedIn                = "reservation already checked in"
 	ErrNotCheckedInYet                 = "reservation not checked in yet"
 	ErrNotCheckedOutYet                = "reservation not checked out yet"
 	ErrInvalidDate                     = "invalid date"
@@ -31,4 +30,5 @@ const (
 	ErrNotTheOwner                     = "you are not the owner of this resource"
 	ErrCheckoutQuantityMoreThanStocks  = "checkout quantity more than stocks"
 	ErrCheckoutQuantityMoreThanAllowed = "checkout quantity more than allowed"
+	ErrAlreadyOwned                    = "you already own this product"
 )

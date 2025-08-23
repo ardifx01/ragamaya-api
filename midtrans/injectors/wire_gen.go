@@ -11,18 +11,26 @@ import (
 	"github.com/google/wire"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
+	"ragamaya-api/api/orders/repositories"
+	"ragamaya-api/api/orders/services"
+	repositories2 "ragamaya-api/api/payments/repositories"
+	repositories3 "ragamaya-api/api/products/repositories"
 	"ragamaya-api/midtrans/notifications/controllers"
-	"ragamaya-api/midtrans/notifications/services"
+	services2 "ragamaya-api/midtrans/notifications/services"
 )
 
 // Injectors from injector.go:
 
 func InitializeNotificationController(db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) controllers.CompControllers {
-	compServices := services.NewComponentServices(db, validate)
-	compControllers := controllers.NewCompController(compServices)
+	compRepositories := repositories.NewComponentRepository()
+	repositoriesCompRepositories := repositories2.NewComponentRepository()
+	compRepositories2 := repositories3.NewComponentRepository()
+	compServices := services.NewComponentServices(compRepositories, db, validate, midtransCore, repositoriesCompRepositories, compRepositories2)
+	servicesCompServices := services2.NewComponentServices(db, validate, compServices, compRepositories, repositoriesCompRepositories, compRepositories2)
+	compControllers := controllers.NewCompController(servicesCompServices)
 	return compControllers
 }
 
 // injector.go:
 
-var notificationFeatureSet = wire.NewSet(services.NewComponentServices, controllers.NewCompController)
+var notificationFeatureSet = wire.NewSet(services2.NewComponentServices, controllers.NewCompController, services.NewComponentServices, repositories.NewComponentRepository, repositories2.NewComponentRepository, repositories3.NewComponentRepository)

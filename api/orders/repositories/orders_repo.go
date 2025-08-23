@@ -13,4 +13,5 @@ type CompRepositories interface {
 	FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.Orders, *exceptions.Exception)
 	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Orders, *exceptions.Exception)
 	Update(ctx *gin.Context, tx *gorm.DB, data models.Orders) *exceptions.Exception
+	LockForUpdateWithTimeout(ctx *gin.Context, tx *gorm.DB, orderUUID string, timeoutSeconds int) *exceptions.Exception
 }

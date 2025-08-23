@@ -157,3 +157,24 @@ func (r *CompRepositoriesImpl) RestoreStockByUUID(ctx *gin.Context, tx *gorm.DB,
 
 	return nil
 }
+
+func (r *CompRepositoriesImpl) CreateProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, data models.ProductDigitalOwned) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
+}
+
+func (r *CompRepositoriesImpl) IsProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string, productUUID string) bool {
+	var productDigitalOwned models.ProductDigitalOwned
+	result := tx.
+		Where("user_uuid = ?", userUUID).
+		Where("product_uuid = ?", productUUID).
+		First(&productDigitalOwned)
+	if result.Error != nil {
+		return false
+	}
+	return true
+}

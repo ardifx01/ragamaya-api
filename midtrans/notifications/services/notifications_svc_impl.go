@@ -1,9 +1,18 @@
 package services
 
 import (
+	"fmt"
 	"ragamaya-api/midtrans/notifications/dto"
+	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
+	"ragamaya-api/pkg/mapper"
+
+	orderDTO "ragamaya-api/api/orders/dto"
+	orderService "ragamaya-api/api/orders/services"
+	orderRepo "ragamaya-api/api/orders/repositories"
+	paymentRepo "ragamaya-api/api/payments/repositories"
+	productRepo "ragamaya-api/api/products/repositories"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -11,17 +20,29 @@ import (
 )
 
 type CompServicesImpl struct {
-	DB       *gorm.DB
-	validate *validator.Validate
+	DB           *gorm.DB
+	validate     *validator.Validate
+	orderService orderService.CompServices
+	orderRepo    orderRepo.CompRepositories
+	paymentRepo  paymentRepo.CompRepositories
+	productRepo  productRepo.CompRepositories
 }
 
 func NewComponentServices(
 	db *gorm.DB,
 	validate *validator.Validate,
+	orderService orderService.CompServices,
+	orderRepo orderRepo.CompRepositories,
+	paymentRepo paymentRepo.CompRepositories,
+	productRepo productRepo.CompRepositories,
 ) CompServices {
 	return &CompServicesImpl{
-		DB:       db,
-		validate: validate,
+		DB:           db,
+		validate:     validate,
+		orderService: orderService,
+		orderRepo:    orderRepo,
+		paymentRepo:  paymentRepo,
+		productRepo:  productRepo,
 	}
 }
 
@@ -33,6 +54,110 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 
 	tx := s.DB.Begin()
 	defer helpers.CommitOrRollback(tx)
+
+	orderData, err := s.orderRepo.FindByUUID(ctx, tx, data.OrderId)
+	if err != nil {
+		return err
+	}
+
+	if !s.isValidStatusTransition(orderData.Status, string(data.TransactionStatus)) {
+		return exceptions.NewValidationException(fmt.Errorf("invalid status transition from %s to %s",
+			orderData.Status, string(data.TransactionStatus)))
+	}
+
+	err = s.orderRepo.LockForUpdateWithTimeout(ctx, tx, data.OrderId, 5)
+	if err != nil {
+		return err
+	}
+
+	if orderData.Status == string(data.TransactionStatus) {
+		return nil
+	}
+
+	err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: string(data.TransactionStatus)})
+	if err != nil {
+		return err
+	}
+
+	err = s.paymentRepo.Update(ctx, tx, models.Payments{UUID: data.TransactionId, TransactionStatus: string(data.TransactionStatus)})
+	if err != nil {
+		return err
+	}
+
+	result := mapper.MapOrderMTO(*orderData)
+
+	if data.TransactionStatus == dto.Capture || data.TransactionStatus == dto.Settlement {
+		isOwned := s.productRepo.IsProductDigitalOwned(ctx, tx, orderData.UserUUID, orderData.ProductUUID)
+
+		if isOwned {
+			result.Status = "settlement"
+			err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: result.Status})
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+
+		result.Status = "processing"
+		err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: result.Status})
+		if err != nil {
+			return err
+		}
+
+		s.orderService.SendStreamEvent(ctx, data.OrderId, orderDTO.OrderStreamRes{
+			Type:    "info",
+			Message: "Payment status updated",
+			Body:    result,
+		})
+
+		err = s.productRepo.CreateProductDigitalOwned(ctx, tx, models.ProductDigitalOwned{
+			ProductUUID: orderData.ProductUUID,
+			UserUUID:    orderData.UserUUID,
+		})
+		if err != nil {
+			if helpers.IsDuplicateKeyError(err) {
+				return nil
+			}
+			return err
+		}
+
+		result.Status = "settlement"
+		err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: result.Status})
+		if err != nil {
+			return err
+		}
+
+		s.orderService.SendStreamEvent(ctx, data.OrderId, orderDTO.OrderStreamRes{
+			Type:    "info",
+			Message: "Ticket generated",
+			Body:    result,
+		})
+
+	} else if data.TransactionStatus == dto.Deny ||
+		data.TransactionStatus == dto.Cancel ||
+		data.TransactionStatus == dto.Expire ||
+		data.TransactionStatus == dto.Failure {
+
+		if s.shouldRestoreStock(orderData.Status) {
+			err := s.productRepo.RestoreStockByUUID(ctx, tx, orderData.ProductUUID)
+			if err != nil {
+				return err
+			}
+		}
+
+		s.orderService.SendStreamEvent(ctx, data.OrderId, orderDTO.OrderStreamRes{
+			Type:    "info",
+			Message: "Payment status updated",
+			Body:    result,
+		})
+
+	} else {
+		s.orderService.SendStreamEvent(ctx, data.OrderId, orderDTO.OrderStreamRes{
+			Type:    "info",
+			Message: "Payment status updated",
+			Body:    result,
+		})
+	}
 
 	return nil
 }

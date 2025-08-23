@@ -22,7 +22,7 @@ type Products struct {
 	ProductType ProductType `gorm:"not null;index"`
 	Name        string      `gorm:"not null"`
 	Description string      `gorm:"not null"`
-	Price       int64        `gorm:"not null"`
+	Price       int64       `gorm:"not null"`
 	Stock       int         `gorm:"not null"`
 	Keywords    string      `gorm:"not null"`
 
@@ -60,3 +60,19 @@ type ProductDigitalFiles struct {
 	UpdatedAt time.Time  `gorm:"not null"`
 	DeletedAt *time.Time `gorm:"index"`
 }
+
+type ProductDigitalOwned struct {
+	gorm.Model
+
+	ID          uint   `gorm:"primaryKey"`
+	ProductUUID string `gorm:"not null;index;uniqueIndex:idx_user_product"`
+	UserUUID    string `gorm:"not null;index;uniqueIndex:idx_user_product"`
+
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
+	DeletedAt *time.Time `gorm:"index"`
+
+	Product Products `gorm:"foreignKey:ProductUUID;references:UUID"`
+	User    Users    `gorm:"foreignKey:UserUUID;references:UUID"`
+}
+

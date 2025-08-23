@@ -4,8 +4,8 @@ import (
 	"crypto/hmac"
 	"net/http"
 	"os"
-	"ragamaya-api/midtrans/notifications/services"
 	"ragamaya-api/midtrans/notifications/dto"
+	"ragamaya-api/midtrans/notifications/services"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 
@@ -40,6 +40,11 @@ func (h *CompControllersImpl) Payment(ctx *gin.Context) {
 		return
 	}
 
+	err := h.services.Payment(ctx, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
 
 	ctx.JSON(http.StatusOK, dto.Response{
 		Status:  http.StatusOK,

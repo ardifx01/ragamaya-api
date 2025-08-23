@@ -106,7 +106,7 @@ func (s *CompServicesImpl) prepareOrder(ctx *gin.Context, tx *gorm.DB, data dto.
 
 	if productData.ProductType == models.Digital {
 		isOwned := s.productRepo.IsProductDigitalOwned(ctx, tx, userData.UUID, productData.UUID)
-		if !isOwned {
+		if isOwned {
 			return nil, exceptions.NewException(http.StatusForbidden, exceptions.ErrAlreadyOwned)
 		}
 

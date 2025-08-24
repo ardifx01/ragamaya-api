@@ -27,6 +27,8 @@ func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models
 func (r *CompRepositoriesImpl) FindAll(ctx *gin.Context, tx *gorm.DB) (*[]models.Payments, *exceptions.Exception) {
 	var payments []models.Payments
 	result := tx.
+		Preload("Product").
+		Preload("Product.Thumbnails").
 		Order("created_at DESC").
 		Find(&payments)
 	if result.Error != nil {
@@ -42,6 +44,8 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 	result := tx.
 		Preload("PaymentActions").
 		Preload("PaymentVANumbers").
+		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("uuid = ?", uuid).
 		Order("created_at DESC").
 		First(&payment)
@@ -59,6 +63,7 @@ func (r *CompRepositoriesImpl) FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uui
 		Preload("PaymentActions").
 		Preload("PaymentVANumbers").
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("user_uuid = ?", uuid).
 		Order("created_at DESC").
 		Find(&payments)
@@ -76,6 +81,7 @@ func (r *CompRepositoriesImpl) FindPendingByUserUUID(ctx *gin.Context, tx *gorm.
 		Preload("PaymentActions").
 		Preload("PaymentVANumbers").
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("user_uuid = ?", uuid).
 		Where("transaction_status = ?", "pending").
 		Order("created_at DESC").
@@ -92,6 +98,7 @@ func (r *CompRepositoriesImpl) FindFailedByUserUUID(ctx *gin.Context, tx *gorm.D
 
 	result := tx.
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("user_uuid = ?", uuid).
 		Where("transaction_status = ? OR transaction_status = ? OR transaction_status = ? OR transaction_status = ?", "expire", "deny", "cancel", "failure").
 		Order("created_at DESC").
@@ -108,6 +115,7 @@ func (r *CompRepositoriesImpl) FindSuccessByUserUUID(ctx *gin.Context, tx *gorm.
 
 	result := tx.
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("user_uuid = ?", uuid).
 		Where("transaction_status = ? OR transaction_status = ?", "capture", "settlement").
 		Order("created_at DESC").
@@ -124,6 +132,7 @@ func (r *CompRepositoriesImpl) FindRefundByUserUUID(ctx *gin.Context, tx *gorm.D
 
 	result := tx.
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("user_uuid = ?", uuid).
 		Where("transaction_status = ? OR transaction_status = ?", "refund", "partial_refund").
 		Order("created_at DESC").
@@ -139,6 +148,10 @@ func (r *CompRepositoriesImpl) FindByOrderUUID(ctx *gin.Context, tx *gorm.DB, uu
 	var payments []models.Payments
 
 	result := tx.
+		Preload("PaymentActions").
+		Preload("PaymentVANumbers").
+		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("order_uuid = ?", uuid).
 		Order("created_at DESC").
 		Find(&payments)
@@ -153,6 +166,8 @@ func (r *CompRepositoriesImpl) FindByProductUUID(ctx *gin.Context, tx *gorm.DB, 
 	var payments []models.Payments
 
 	result := tx.
+		Preload("Product").
+		Preload("Product.Thumbnails").
 		Where("product_uuid = ?", uuid).
 		Order("created_at DESC").
 		Find(&payments)
@@ -168,6 +183,7 @@ func (r *CompRepositoriesImpl) FindSuccessByProductUUID(ctx *gin.Context, tx *go
 
 	result := tx.
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Preload("Order").
 		Where("product_uuid = ?", uuid).
 		Where("transaction_status = ? OR transaction_status = ?", "capture", "settlement").

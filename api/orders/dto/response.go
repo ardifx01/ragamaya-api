@@ -15,7 +15,7 @@ type OrderRes struct {
 	Quantity    int    `json:"quantity"`
 	GrossAmt    int64  `json:"amount"`
 	Status      string `json:"status"`
-	
+
 	Payments []OrderPaymentRes `json:"payments,omitempty"`
 }
 
@@ -34,11 +34,14 @@ type OrderChargeRes struct {
 }
 
 type OrderPaymentRes struct {
-	UUID                   string                    `json:"uuid"`
-	GrossAmount            uint                      `json:"gross_amount"`
-	TransactionStatus      string                    `json:"transaction_status"`
+	UUID                   string                    `json:"uuid,omitempty"`
+	UserUUID               string                    `json:"user_uuid,omitempty"`
+	ProductUUID            string                    `json:"product_uuid,omitempty"`
+	OrderUUID              string                    `json:"order_uuid,omitempty"`
+	GrossAmount            uint                      `json:"gross_amount,omitempty"`
 	PaymentType            string                    `json:"payment_type,omitempty"`
 	TransactionTime        string                    `json:"transaction_time,omitempty"`
+	TransactionStatus      string                    `json:"transaction_status,omitempty"`
 	FraudStatus            string                    `json:"fraud_status,omitempty"`
 	MaskedCard             string                    `json:"masked_card,omitempty"`
 	StatusCode             string                    `json:"status_code,omitempty"`
@@ -50,7 +53,6 @@ type OrderPaymentRes struct {
 	Currency               string                    `json:"currency,omitempty"`
 	CardType               string                    `json:"card_type,omitempty"`
 	RedirectURL            string                    `json:"redirect_url,omitempty"`
-	ValidationMessages     []string                  `json:"validation_messages,omitempty"`
 	InstallmentTerm        string                    `json:"installment_term,omitempty"`
 	Eci                    string                    `json:"eci,omitempty"`
 	SavedTokenID           string                    `json:"saved_token_id,omitempty"`
@@ -68,6 +70,7 @@ type OrderPaymentRes struct {
 	OnUs                   bool                      `json:"on_us,omitempty"`
 	ThreeDsVersion         string                    `json:"three_ds_version,omitempty"`
 	ExpiryTime             string                    `json:"expiry_time,omitempty"`
+	
 	PaymentActions         []OrderPaymentActionRes   `json:"payment_actions,omitempty" mapstructure:"actions"`
 	PaymentVANumbers       []OrderPaymentVANumberRes `json:"payment_va_numbers,omitempty" mapstructure:"va_numbers"`
 }

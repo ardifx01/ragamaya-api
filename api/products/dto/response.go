@@ -21,7 +21,6 @@ type ProductRes struct {
 }
 
 type ProductThumbnailsRes struct {
-	UUID         string `json:"uuid"`
 	ThumbnailURL string `json:"thumbnail_url" validate:"required,url"`
 }
 

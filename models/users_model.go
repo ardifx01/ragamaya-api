@@ -30,4 +30,5 @@ type Users struct {
 	DeletedAt *time.Time `gorm:"index"`
 
 	SellerProfile Sellers `gorm:"foreignKey:UserUUID;references:UUID"`
+	Wallet        Wallet  `gorm:"foreignKey:UserUUID;references:UUID"`
 }

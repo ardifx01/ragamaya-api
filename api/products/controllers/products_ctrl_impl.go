@@ -88,5 +88,6 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 		Status:  http.StatusOK,
 		Message: "data retrieved successfully",
 		Body:    result,
+		Size:    len(result),
 	})
 }

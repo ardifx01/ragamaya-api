@@ -102,7 +102,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 	claims["name"] = user.Name
 	claims["role"] = user.Role
 	claims["avatar_url"] = user.AvatarURL
-	claims["seller_profile"] = user.SellerProfile
+	claims["seller_profile"] = user.SellerProfile.ToJWTPayload()
 	claims["exp"] = time.Now().Add(time.Hour * 10).Unix()
 	accessTokenStr, signErr := token.SignedString([]byte(jwtSecret))
 	if signErr != nil {

@@ -5,7 +5,6 @@ import (
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/services"
 	"ragamaya-api/pkg/exceptions"
-	"ragamaya-api/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -75,8 +74,6 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
 		return
 	}
-
-	logger.Info("Search: ", data)
 
 	result, err := h.services.Search(ctx, data)
 	if err != nil {

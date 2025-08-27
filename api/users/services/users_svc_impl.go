@@ -8,6 +8,8 @@ import (
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/logger"
 
+	walletRepo "ragamaya-api/api/wallets/repositories"
+
 	"os"
 	"time"
 
@@ -23,13 +25,16 @@ type CompServicesImpl struct {
 	repo     repositories.CompRepositories
 	DB       *gorm.DB
 	validate *validator.Validate
+
+	walletRepo walletRepo.CompRepositories
 }
 
-func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate) CompServices {
+func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate, walletRepo walletRepo.CompRepositories) CompServices {
 	return &CompServicesImpl{
-		repo:     compRepositories,
-		DB:       db,
-		validate: validate,
+		repo:       compRepositories,
+		DB:         db,
+		validate:   validate,
+		walletRepo: walletRepo,
 	}
 }
 
@@ -75,6 +80,9 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 	user, err := s.repo.FindByEmail(ctx, s.DB, googleData.Email)
 	if err != nil {
 		if err.Status == 404 {
+			tx := s.DB.Begin()
+			defer helpers.CommitOrRollback(tx)
+
 			user = &models.Users{
 				UUID:            uuid.NewString(),
 				Email:           googleData.Email,
@@ -84,7 +92,13 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 				Role:            "user",
 				AvatarURL:       googleData.Picture,
 			}
-			if err := s.repo.Create(ctx, s.DB, *user); err != nil {
+			if err := s.repo.Create(ctx, tx, *user); err != nil {
+				return nil, err
+			}
+
+			if err := s.walletRepo.Create(ctx, tx, models.Wallet{
+				UserUUID: user.UUID,
+			}); err != nil {
 				return nil, err
 			}
 		} else {

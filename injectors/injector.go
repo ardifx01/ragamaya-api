@@ -25,11 +25,15 @@ import (
 	orderControllers "ragamaya-api/api/orders/controllers"
 	orderRepositories "ragamaya-api/api/orders/repositories"
 	orderServices "ragamaya-api/api/orders/services"
-
+	
 	paymentControllers "ragamaya-api/api/payments/controllers"
 	paymentRepositories "ragamaya-api/api/payments/repositories"
 	paymentServices "ragamaya-api/api/payments/services"
 
+	walletControllers "ragamaya-api/api/wallets/controllers"
+	walletRepositories "ragamaya-api/api/wallets/repositories"
+	walletServices "ragamaya-api/api/wallets/services"
+	
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
@@ -41,6 +45,8 @@ var userFeatureSet = wire.NewSet(
 	userRepositories.NewComponentRepository,
 	userServices.NewComponentServices,
 	userControllers.NewCompController,
+	
+	walletRepositories.NewComponentRepository,
 )
 
 var storageFeatureSet = wire.NewSet(
@@ -78,6 +84,12 @@ var paymentFeatureSet = wire.NewSet(
 	paymentControllers.NewCompController,
 )
 
+var walletFeatureSet = wire.NewSet(
+	walletRepositories.NewComponentRepository,
+	walletServices.NewComponentServices,
+	walletControllers.NewCompController,
+)
+
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
 	wire.Build(userFeatureSet)
 	return nil
@@ -105,5 +117,10 @@ func InitializeOrderController(db *gorm.DB, validate *validator.Validate, midtra
 
 func InitializePaymentController(db *gorm.DB, validate *validator.Validate) paymentControllers.CompControllers {
 	wire.Build(paymentFeatureSet)
+	return nil
+}
+
+func InitializeWalletController(db *gorm.DB, validate *validator.Validate) walletControllers.CompControllers {
+	wire.Build(walletFeatureSet)
 	return nil
 }

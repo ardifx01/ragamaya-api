@@ -13,43 +13,47 @@ import (
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
 	controllers5 "ragamaya-api/api/orders/controllers"
-	repositories5 "ragamaya-api/api/orders/repositories"
+	repositories6 "ragamaya-api/api/orders/repositories"
 	services5 "ragamaya-api/api/orders/services"
 	controllers6 "ragamaya-api/api/payments/controllers"
-	repositories6 "ragamaya-api/api/payments/repositories"
+	repositories7 "ragamaya-api/api/payments/repositories"
 	services6 "ragamaya-api/api/payments/services"
 	controllers4 "ragamaya-api/api/products/controllers"
-	repositories4 "ragamaya-api/api/products/repositories"
+	repositories5 "ragamaya-api/api/products/repositories"
 	services4 "ragamaya-api/api/products/services"
 	controllers3 "ragamaya-api/api/sellers/controllers"
-	repositories3 "ragamaya-api/api/sellers/repositories"
+	repositories4 "ragamaya-api/api/sellers/repositories"
 	services3 "ragamaya-api/api/sellers/services"
 	controllers2 "ragamaya-api/api/storages/controllers"
-	repositories2 "ragamaya-api/api/storages/repositories"
+	repositories3 "ragamaya-api/api/storages/repositories"
 	services2 "ragamaya-api/api/storages/services"
 	"ragamaya-api/api/users/controllers"
 	"ragamaya-api/api/users/repositories"
 	"ragamaya-api/api/users/services"
+	controllers7 "ragamaya-api/api/wallets/controllers"
+	repositories2 "ragamaya-api/api/wallets/repositories"
+	services7 "ragamaya-api/api/wallets/services"
 )
 
 // Injectors from injector.go:
 
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) controllers.CompControllers {
 	compRepositories := repositories.NewComponentRepository()
-	compServices := services.NewComponentServices(compRepositories, db, validate)
+	repositoriesCompRepositories := repositories2.NewComponentRepository()
+	compServices := services.NewComponentServices(compRepositories, db, validate, repositoriesCompRepositories)
 	compControllers := controllers.NewCompController(compServices)
 	return compControllers
 }
 
 func InitializeStorageController(db *gorm.DB, s3client *s3.Client, validate *validator.Validate) controllers2.CompControllers {
-	compRepositories := repositories2.NewComponentRepository()
+	compRepositories := repositories3.NewComponentRepository()
 	compServices := services2.NewComponentServices(compRepositories, db, s3client, validate)
 	compControllers := controllers2.NewCompController(compServices)
 	return compControllers
 }
 
 func InitializeSellerController(db *gorm.DB, validate *validator.Validate) controllers3.CompControllers {
-	compRepositories := repositories3.NewComponentRepository()
+	compRepositories := repositories4.NewComponentRepository()
 	repositoriesCompRepositories := repositories.NewComponentRepository()
 	compServices := services3.NewComponentServices(compRepositories, db, validate, repositoriesCompRepositories)
 	compControllers := controllers3.NewCompController(compServices)
@@ -57,38 +61,47 @@ func InitializeSellerController(db *gorm.DB, validate *validator.Validate) contr
 }
 
 func InitializeProductController(db *gorm.DB, validate *validator.Validate) controllers4.CompControllers {
-	compRepositories := repositories4.NewComponentRepository()
+	compRepositories := repositories5.NewComponentRepository()
 	compServices := services4.NewComponentServices(compRepositories, db, validate)
 	compControllers := controllers4.NewCompController(compServices)
 	return compControllers
 }
 
 func InitializeOrderController(db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) controllers5.CompControllers {
-	compRepositories := repositories5.NewComponentRepository()
-	repositoriesCompRepositories := repositories6.NewComponentRepository()
-	compRepositories2 := repositories4.NewComponentRepository()
+	compRepositories := repositories6.NewComponentRepository()
+	repositoriesCompRepositories := repositories7.NewComponentRepository()
+	compRepositories2 := repositories5.NewComponentRepository()
 	compServices := services5.NewComponentServices(compRepositories, db, validate, midtransCore, repositoriesCompRepositories, compRepositories2)
 	compControllers := controllers5.NewCompController(compServices)
 	return compControllers
 }
 
 func InitializePaymentController(db *gorm.DB, validate *validator.Validate) controllers6.CompControllers {
-	compRepositories := repositories6.NewComponentRepository()
+	compRepositories := repositories7.NewComponentRepository()
 	compServices := services6.NewComponentServices(compRepositories, db, validate)
 	compControllers := controllers6.NewCompController(compServices)
 	return compControllers
 }
 
+func InitializeWalletController(db *gorm.DB, validate *validator.Validate) controllers7.CompControllers {
+	compRepositories := repositories2.NewComponentRepository()
+	compServices := services7.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers7.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
-var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController)
+var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController, repositories2.NewComponentRepository)
 
-var storageFeatureSet = wire.NewSet(repositories2.NewComponentRepository, services2.NewComponentServices, controllers2.NewCompController)
+var storageFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services2.NewComponentServices, controllers2.NewCompController)
 
-var sellerFeatureSet = wire.NewSet(repositories3.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController, repositories.NewComponentRepository)
+var sellerFeatureSet = wire.NewSet(repositories4.NewComponentRepository, services3.NewComponentServices, controllers3.NewCompController, repositories.NewComponentRepository)
 
-var productFeatureSet = wire.NewSet(repositories4.NewComponentRepository, services4.NewComponentServices, controllers4.NewCompController)
+var productFeatureSet = wire.NewSet(repositories5.NewComponentRepository, services4.NewComponentServices, controllers4.NewCompController)
 
-var orderFeatureSet = wire.NewSet(repositories5.NewComponentRepository, services5.NewComponentServices, controllers5.NewCompController, repositories6.NewComponentRepository, repositories4.NewComponentRepository)
+var orderFeatureSet = wire.NewSet(repositories6.NewComponentRepository, services5.NewComponentServices, controllers5.NewCompController, repositories7.NewComponentRepository, repositories5.NewComponentRepository)
 
-var paymentFeatureSet = wire.NewSet(repositories6.NewComponentRepository, services6.NewComponentServices, controllers6.NewCompController)
+var paymentFeatureSet = wire.NewSet(repositories7.NewComponentRepository, services6.NewComponentServices, controllers6.NewCompController)
+
+var walletFeatureSet = wire.NewSet(repositories2.NewComponentRepository, services7.NewComponentServices, controllers7.NewCompController)

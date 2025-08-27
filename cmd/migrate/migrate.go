@@ -24,6 +24,8 @@ func main() {
 		&models.PaymentActions{},
 		&models.PaymentVANumbers{},
 		&models.ProductDigitalOwned{},
+		&models.Wallet{},
+		&models.WalletTransactionHistory{},
 	)
 	if err != nil {
 		panic("failed to migrate models: " + err.Error())

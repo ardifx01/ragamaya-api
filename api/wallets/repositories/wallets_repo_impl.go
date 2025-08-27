@@ -15,6 +15,15 @@ func NewComponentRepository() CompRepositories {
 	return &CompRepositoriesImpl{}
 }
 
+func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models.Wallet) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
+}
+
 func (r *CompRepositoriesImpl) FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Wallet, *exceptions.Exception) {
 	var data models.Wallet
 

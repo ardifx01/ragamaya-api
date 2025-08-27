@@ -10,7 +10,7 @@ type Wallet struct {
 	gorm.Model
 
 	ID       uint   `gorm:"primaryKey" json:"-"`
-	UserUUID string `gorm:"not null;index"`
+	UserUUID string `gorm:"not null;unique;index"`
 
 	Balance int64 `gorm:"not null;default:0"`
 

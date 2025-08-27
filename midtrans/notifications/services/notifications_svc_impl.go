@@ -9,10 +9,12 @@ import (
 	"ragamaya-api/pkg/mapper"
 
 	orderDTO "ragamaya-api/api/orders/dto"
-	orderService "ragamaya-api/api/orders/services"
 	orderRepo "ragamaya-api/api/orders/repositories"
+	orderService "ragamaya-api/api/orders/services"
 	paymentRepo "ragamaya-api/api/payments/repositories"
 	productRepo "ragamaya-api/api/products/repositories"
+	walletDTO "ragamaya-api/api/wallets/dto"
+	walletService "ragamaya-api/api/wallets/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -20,12 +22,13 @@ import (
 )
 
 type CompServicesImpl struct {
-	DB           *gorm.DB
-	validate     *validator.Validate
-	orderService orderService.CompServices
-	orderRepo    orderRepo.CompRepositories
-	paymentRepo  paymentRepo.CompRepositories
-	productRepo  productRepo.CompRepositories
+	DB            *gorm.DB
+	validate      *validator.Validate
+	orderService  orderService.CompServices
+	orderRepo     orderRepo.CompRepositories
+	paymentRepo   paymentRepo.CompRepositories
+	productRepo   productRepo.CompRepositories
+	walletService walletService.CompServices
 }
 
 func NewComponentServices(
@@ -35,14 +38,16 @@ func NewComponentServices(
 	orderRepo orderRepo.CompRepositories,
 	paymentRepo paymentRepo.CompRepositories,
 	productRepo productRepo.CompRepositories,
+	walletService walletService.CompServices,
 ) CompServices {
 	return &CompServicesImpl{
-		DB:           db,
-		validate:     validate,
-		orderService: orderService,
-		orderRepo:    orderRepo,
-		paymentRepo:  paymentRepo,
-		productRepo:  productRepo,
+		DB:            db,
+		validate:      validate,
+		orderService:  orderService,
+		orderRepo:     orderRepo,
+		paymentRepo:   paymentRepo,
+		productRepo:   productRepo,
+		walletService: walletService,
 	}
 }
 
@@ -118,6 +123,22 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 			if helpers.IsDuplicateKeyError(err) {
 				return nil
 			}
+			return err
+		}
+
+		productData, err := s.productRepo.FindByUUID(ctx, tx, orderData.ProductUUID)
+		if err != nil {
+			return err
+		}
+
+		err = s.walletService.CreateTransactionWithTx(ctx, tx, walletDTO.WalletTransactionReq{
+			UserUUID: productData.Seller.UserUUID,
+			Amount: productData.Price,
+			Type: string(models.Debit),
+			Reference: "Order " + data.OrderId,
+			Note: "Income from sales of product " + productData.Name,
+		})
+		if err != nil {
 			return err
 		}
 

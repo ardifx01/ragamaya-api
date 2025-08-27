@@ -15,8 +15,10 @@ import (
 	"ragamaya-api/api/orders/services"
 	repositories2 "ragamaya-api/api/payments/repositories"
 	repositories3 "ragamaya-api/api/products/repositories"
+	repositories4 "ragamaya-api/api/wallets/repositories"
+	services2 "ragamaya-api/api/wallets/services"
 	"ragamaya-api/midtrans/notifications/controllers"
-	services2 "ragamaya-api/midtrans/notifications/services"
+	services3 "ragamaya-api/midtrans/notifications/services"
 )
 
 // Injectors from injector.go:
@@ -26,11 +28,13 @@ func InitializeNotificationController(db *gorm.DB, validate *validator.Validate,
 	repositoriesCompRepositories := repositories2.NewComponentRepository()
 	compRepositories2 := repositories3.NewComponentRepository()
 	compServices := services.NewComponentServices(compRepositories, db, validate, midtransCore, repositoriesCompRepositories, compRepositories2)
-	servicesCompServices := services2.NewComponentServices(db, validate, compServices, compRepositories, repositoriesCompRepositories, compRepositories2)
-	compControllers := controllers.NewCompController(servicesCompServices)
+	compRepositories3 := repositories4.NewComponentRepository()
+	servicesCompServices := services2.NewComponentServices(compRepositories3, db, validate)
+	compServices2 := services3.NewComponentServices(db, validate, compServices, compRepositories, repositoriesCompRepositories, compRepositories2, servicesCompServices)
+	compControllers := controllers.NewCompController(compServices2)
 	return compControllers
 }
 
 // injector.go:
 
-var notificationFeatureSet = wire.NewSet(services2.NewComponentServices, controllers.NewCompController, services.NewComponentServices, repositories.NewComponentRepository, repositories2.NewComponentRepository, repositories3.NewComponentRepository)
+var notificationFeatureSet = wire.NewSet(services3.NewComponentServices, controllers.NewCompController, services.NewComponentServices, repositories.NewComponentRepository, repositories2.NewComponentRepository, repositories3.NewComponentRepository, services2.NewComponentServices, repositories4.NewComponentRepository)

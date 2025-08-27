@@ -32,6 +32,7 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 	var seller models.Products
 	err := tx.
 		Where("uuid = ?", uuid).
+		Preload("Seller").
 		Preload("Thumbnails").
 		Preload("DigitalFiles").
 		First(&seller).

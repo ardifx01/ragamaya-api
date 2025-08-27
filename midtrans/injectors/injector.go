@@ -11,8 +11,10 @@ import (
 	
 	orderServices "ragamaya-api/api/orders/services"
 	orderRepositories "ragamaya-api/api/orders/repositories"
-	PaymentRepositories "ragamaya-api/api/payments/repositories"
-	ProductRepositories "ragamaya-api/api/products/repositories"
+	paymentRepositories "ragamaya-api/api/payments/repositories"
+	productRepositories "ragamaya-api/api/products/repositories"
+	walletServices "ragamaya-api/api/wallets/services"
+	walletRepositories "ragamaya-api/api/wallets/repositories"
 	
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
@@ -26,8 +28,10 @@ var notificationFeatureSet = wire.NewSet(
 
 	orderServices.NewComponentServices,
 	orderRepositories.NewComponentRepository,
-	PaymentRepositories.NewComponentRepository,
-	ProductRepositories.NewComponentRepository,
+	paymentRepositories.NewComponentRepository,
+	productRepositories.NewComponentRepository,
+	walletServices.NewComponentServices,
+	walletRepositories.NewComponentRepository,
 )
 
 func InitializeNotificationController(db *gorm.DB, validate *validator.Validate, midtransCore *coreapi.Client) notificationControllers.CompControllers {

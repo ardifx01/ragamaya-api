@@ -1,14 +1,17 @@
 package services
 
 import (
+	"fmt"
 	"ragamaya-api/api/wallets/dto"
 	"ragamaya-api/api/wallets/repositories"
+	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -59,4 +62,111 @@ func (s *CompServicesImpl) FindTransactionHistoryByUserUUID(ctx *gin.Context) ([
 	}
 
 	return output, nil
+}
+
+func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletTransactionReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(input)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	walletData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.CreateTransaction(ctx, tx, models.WalletTransactionHistory{
+		UUID:      uuid.NewString(),
+		WalletID:  walletData.ID,
+		Amount:    input.Amount,
+		Type:      models.TransactionType(input.Type),
+		Reference: input.Reference,
+		Note:      input.Note,
+	})
+	if err != nil {
+		return err
+	}
+
+	if input.Type == string(models.Debit) {
+		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+			ID:      walletData.ID,
+			Balance: walletData.Balance + input.Amount,
+		})
+		if err != nil {
+			return err
+		}
+	} else if input.Type == string(models.Credit) {
+		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+			ID:      walletData.ID,
+			Balance: walletData.Balance - input.Amount,
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		tx.Rollback()
+		return exceptions.NewValidationException(fmt.Errorf("type must be debit or credit"))
+	}
+
+	return nil
+}
+
+func (s *CompServicesImpl) CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB, input dto.WalletTransactionReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(input)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	walletData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.CreateTransaction(ctx, tx, models.WalletTransactionHistory{
+		UUID:      uuid.NewString(),
+		WalletID:  walletData.ID,
+		Amount:    input.Amount,
+		Type:      models.TransactionType(input.Type),
+		Reference: input.Reference,
+		Note:      input.Note,
+	})
+	if err != nil {
+		return err
+	}
+
+	if input.Type == string(models.Debit) {
+		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+			ID:      walletData.ID,
+			Balance: walletData.Balance + input.Amount,
+		})
+		if err != nil {
+			return err
+		}
+	} else if input.Type == string(models.Credit) {
+		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+			ID:      walletData.ID,
+			Balance: walletData.Balance - input.Amount,
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		tx.Rollback()
+		return exceptions.NewValidationException(fmt.Errorf("type must be debit or credit"))
+	}
+
+	return nil
 }

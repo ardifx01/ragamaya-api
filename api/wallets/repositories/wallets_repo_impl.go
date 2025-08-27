@@ -35,6 +35,14 @@ func (r *CompRepositoriesImpl) FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uui
 	return &data, nil
 }
 
+func (r *CompRepositoriesImpl) UpdateBalance(ctx *gin.Context, tx *gorm.DB, data models.Wallet) *exceptions.Exception {
+	result := tx.Where("user_uuid = ?", data.UserUUID).Updates(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+	return nil
+}
+
 func (r *CompRepositoriesImpl) FindTransactionHistoryByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.WalletTransactionHistory, *exceptions.Exception) {
 	var data []models.WalletTransactionHistory
 
@@ -47,4 +55,13 @@ func (r *CompRepositoriesImpl) FindTransactionHistoryByUserUUID(ctx *gin.Context
 	}
 
 	return data, nil
+}
+
+func (r *CompRepositoriesImpl) CreateTransaction(ctx *gin.Context, tx *gorm.DB, data models.WalletTransactionHistory) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
 }

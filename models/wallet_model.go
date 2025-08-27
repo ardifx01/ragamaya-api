@@ -6,6 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type TransactionType string
+
+const (
+	Debit  TransactionType = "debit"
+	Credit TransactionType = "credit"
+)
+
 type Wallet struct {
 	gorm.Model
 
@@ -24,13 +31,14 @@ type Wallet struct {
 type WalletTransactionHistory struct {
 	gorm.Model
 
-	ID       uint `gorm:"primaryKey" json:"-"`
-	WalletID uint `gorm:"not null;index"`
+	ID       uint   `gorm:"primaryKey" json:"-"`
+	UUID     string `gorm:"not null;unique;index"`
+	WalletID uint   `gorm:"not null;index"`
 
-	Amount    int64  `gorm:"not null"`
-	Type      string `gorm:"not null"` // e.g., "credit" or "debit"
-	Reference string `gorm:"not null"` // e.g., "order_payment", "refund", etc.
-	Note      string `gorm:"type:text"`
+	Amount    int64           `gorm:"not null"`
+	Type      TransactionType `gorm:"not null"` // e.g., "credit" or "debit"
+	Reference string          `gorm:"not null"` // e.g., "order_payment", "refund", etc.
+	Note      string          `gorm:"type:text"`
 
 	CreatedAt time.Time  `gorm:"not null"`
 	UpdatedAt time.Time  `gorm:"not null"`

@@ -32,6 +32,8 @@ type Products struct {
 
 	Thumbnails   []ProductThumbnails   `gorm:"foreignKey:ProductUUID;references:UUID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 	DigitalFiles []ProductDigitalFiles `gorm:"foreignKey:ProductUUID;references:UUID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+
+	Seller Sellers `gorm:"foreignKey:SellerUUID;references:UUID"`
 }
 
 type ProductThumbnails struct {
@@ -75,4 +77,3 @@ type ProductDigitalOwned struct {
 	Product Products `gorm:"foreignKey:ProductUUID;references:UUID"`
 	User    Users    `gorm:"foreignKey:UserUUID;references:UUID"`
 }
-

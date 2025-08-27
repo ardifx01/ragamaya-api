@@ -11,5 +11,7 @@ import (
 type CompRepositories interface {
 	Create(ctx *gin.Context, tx *gorm.DB, data models.Wallet) *exceptions.Exception
 	FindByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Wallet, *exceptions.Exception)
+	UpdateBalance(ctx *gin.Context, tx *gorm.DB, data models.Wallet) *exceptions.Exception 
+	CreateTransaction(ctx *gin.Context, tx *gorm.DB, data models.WalletTransactionHistory) *exceptions.Exception
 	FindTransactionHistoryByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.WalletTransactionHistory, *exceptions.Exception)
 }

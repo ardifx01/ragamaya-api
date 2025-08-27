@@ -12,5 +12,6 @@ func WalletRoutes(r *gin.RouterGroup, walletController controllers.CompControlle
 	walletGroup.Use(middleware.AuthMiddleware())
 	{
 		walletGroup.GET("/info", walletController.FindByUserUUID)
+		walletGroup.GET("/history", walletController.FindTransactionHistoryByUserUUID)
 	}
 }

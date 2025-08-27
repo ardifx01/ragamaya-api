@@ -104,10 +104,10 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 		}
 
 		result.Status = "processing"
-		err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: result.Status})
-		if err != nil {
-			return err
-		}
+		// err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: result.Status})
+		// if err != nil {
+		// 	return err
+		// }
 
 		s.orderService.SendStreamEvent(ctx, data.OrderId, orderDTO.OrderStreamRes{
 			Type:    "info",
@@ -132,11 +132,11 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 		}
 
 		err = s.walletService.CreateTransactionWithTx(ctx, tx, walletDTO.WalletTransactionReq{
-			UserUUID: productData.Seller.UserUUID,
-			Amount: productData.Price,
-			Type: string(models.Debit),
+			UserUUID:  productData.Seller.UserUUID,
+			Amount:    productData.Price,
+			Type:      string(models.Debit),
 			Reference: "Order " + data.OrderId,
-			Note: "Income from sales of product " + productData.Name,
+			Note:      "Income from sales of product " + productData.Name,
 		})
 		if err != nil {
 			return err

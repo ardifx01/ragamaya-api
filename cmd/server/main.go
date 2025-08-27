@@ -49,7 +49,6 @@ func main() {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	lmt := tollbooth.NewLimiter(5, &limiter.ExpirableOptions{DefaultExpirationTTL: time.Second})
 
-	r.Use(middleware.ClientTracker(db))
 	r.Use(middleware.GzipResponseMiddleware())
 	r.Use(middleware.RateLimitMiddleware(lmt))
 

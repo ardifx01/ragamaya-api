@@ -7,6 +7,7 @@ import (
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
+	"ragamaya-api/pkg/logger"
 	"ragamaya-api/pkg/mapper"
 
 	"github.com/gin-gonic/gin"
@@ -70,15 +71,10 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 		return exceptions.NewValidationException(validateErr)
 	}
 
-	userData, err := helpers.GetUserData(ctx)
-	if err != nil {
-		return err
-	}
-
 	tx := s.DB.Begin()
 	defer helpers.CommitOrRollback(tx)
 
-	walletData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	walletData, err := s.repo.FindByUserUUID(ctx, tx, input.UserUUID)
 	if err != nil {
 		return err
 	}
@@ -97,7 +93,7 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 
 	if input.Type == string(models.Debit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
-			ID:      walletData.ID,
+			UserUUID: walletData.UserUUID,
 			Balance: walletData.Balance + input.Amount,
 		})
 		if err != nil {
@@ -105,7 +101,7 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 		}
 	} else if input.Type == string(models.Credit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
-			ID:      walletData.ID,
+			UserUUID: walletData.UserUUID,
 			Balance: walletData.Balance - input.Amount,
 		})
 		if err != nil {
@@ -120,17 +116,13 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 }
 
 func (s *CompServicesImpl) CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB, input dto.WalletTransactionReq) *exceptions.Exception {
+	logger.Info("CreateTransactionWithTx called")
 	validateErr := s.validate.Struct(input)
 	if validateErr != nil {
 		return exceptions.NewValidationException(validateErr)
 	}
 
-	userData, err := helpers.GetUserData(ctx)
-	if err != nil {
-		return err
-	}
-
-	walletData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	walletData, err := s.repo.FindByUserUUID(ctx, tx, input.UserUUID)
 	if err != nil {
 		return err
 	}
@@ -149,15 +141,15 @@ func (s *CompServicesImpl) CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB
 
 	if input.Type == string(models.Debit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
-			ID:      walletData.ID,
-			Balance: walletData.Balance + input.Amount,
+			UserUUID: walletData.UserUUID,
+			Balance:  walletData.Balance + input.Amount,
 		})
 		if err != nil {
 			return err
 		}
 	} else if input.Type == string(models.Credit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
-			ID:      walletData.ID,
+			UserUUID: walletData.UserUUID,
 			Balance: walletData.Balance - input.Amount,
 		})
 		if err != nil {

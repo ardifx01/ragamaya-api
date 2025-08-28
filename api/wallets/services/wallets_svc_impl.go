@@ -94,7 +94,7 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 	if input.Type == string(models.Debit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
 			UserUUID: walletData.UserUUID,
-			Balance: walletData.Balance + input.Amount,
+			Balance:  walletData.Balance + input.Amount,
 		})
 		if err != nil {
 			return err
@@ -102,7 +102,7 @@ func (s *CompServicesImpl) CreateTransaction(ctx *gin.Context, input dto.WalletT
 	} else if input.Type == string(models.Credit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
 			UserUUID: walletData.UserUUID,
-			Balance: walletData.Balance - input.Amount,
+			Balance:  walletData.Balance - input.Amount,
 		})
 		if err != nil {
 			return err
@@ -150,7 +150,7 @@ func (s *CompServicesImpl) CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB
 	} else if input.Type == string(models.Credit) {
 		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
 			UserUUID: walletData.UserUUID,
-			Balance: walletData.Balance - input.Amount,
+			Balance:  walletData.Balance - input.Amount,
 		})
 		if err != nil {
 			return err
@@ -158,6 +158,61 @@ func (s *CompServicesImpl) CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB
 	} else {
 		tx.Rollback()
 		return exceptions.NewValidationException(fmt.Errorf("type must be debit or credit"))
+	}
+
+	return nil
+}
+
+func (s *CompServicesImpl) RequestPayout(ctx *gin.Context, data dto.WalletPayoutReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	walletData, err := s.repo.FindByUserUUID(ctx, tx, userData.UUID)
+	if err != nil {
+		return err
+	}
+
+	if walletData.Balance < data.Amount {
+		return exceptions.NewValidationException(fmt.Errorf("insufficient balance"))
+	}
+
+	input := mapper.MapPayoutITM(data)
+	input.UUID = uuid.NewString()
+	input.WalletID = walletData.ID
+
+	err = s.repo.CreateTransaction(ctx, tx, models.WalletTransactionHistory{
+		UUID:      uuid.NewString(),
+		WalletID:  walletData.ID,
+		Amount:    input.Amount,
+		Type:      models.Credit,
+		Reference: "Payout " + input.UUID,
+		Note:      "Payout request",
+	})
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+		UserUUID: walletData.UserUUID,
+		Balance:  walletData.Balance - input.Amount,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.CreatePayoutRequest(ctx, tx, input)
+	if err != nil {
+		return err
 	}
 
 	return nil

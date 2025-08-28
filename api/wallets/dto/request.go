@@ -7,3 +7,10 @@ type WalletTransactionReq struct {
 	Reference string `json:"reference" validate:"required"`
 	Note      string `json:"note" validate:"required"`
 }
+
+type WalletPayoutReq struct {
+	Amount          int64        `json:"amount" validate:"required,gte=50000"`
+	BankName        string       `json:"bank_name" validate:"required,oneof=bca bni bri mandiri"`
+	BankAccount     string       `json:"bank_account" validate:"required,number"`
+	BankAccountName string       `json:"bank_account_name" validate:"required"`
+}

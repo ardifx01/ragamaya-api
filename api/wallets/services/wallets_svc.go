@@ -13,4 +13,5 @@ type CompServices interface {
 	FindTransactionHistoryByUserUUID(ctx *gin.Context) ([]dto.WalletTransactionRes, *exceptions.Exception)
 	CreateTransaction(ctx *gin.Context, input dto.WalletTransactionReq) *exceptions.Exception
 	CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB,  input dto.WalletTransactionReq) *exceptions.Exception 
+	RequestPayout(ctx *gin.Context, data dto.WalletPayoutReq) *exceptions.Exception
 }

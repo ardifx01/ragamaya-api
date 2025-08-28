@@ -21,3 +21,10 @@ func MapWalletTransactionMTO(input models.WalletTransactionHistory) dto.WalletTr
 	output.CreatedAt = input.CreatedAt
 	return output
 }
+
+func MapPayoutITM(input dto.WalletPayoutReq) models.WalletPayoutRequest {
+	var output models.WalletPayoutRequest
+
+	mapstructure.Decode(input, &output)
+	return output
+}

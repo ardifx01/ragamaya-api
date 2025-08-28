@@ -65,3 +65,12 @@ func (r *CompRepositoriesImpl) CreateTransaction(ctx *gin.Context, tx *gorm.DB, 
 
 	return nil
 }
+
+func (r *CompRepositoriesImpl) CreatePayoutRequest(ctx *gin.Context, tx *gorm.DB, data models.WalletPayoutRequest) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
+}

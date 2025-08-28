@@ -13,5 +13,6 @@ func WalletRoutes(r *gin.RouterGroup, walletController controllers.CompControlle
 	{
 		walletGroup.GET("/info", walletController.FindByUserUUID)
 		walletGroup.GET("/history", walletController.FindTransactionHistoryByUserUUID)
+		walletGroup.POST("/payout", walletController.RequestPayout)
 	}
 }

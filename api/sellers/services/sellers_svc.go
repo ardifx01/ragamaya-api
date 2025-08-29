@@ -13,4 +13,5 @@ type CompServices interface {
 	FindByUserUUID(ctx *gin.Context, uuid string) (*dto.SellerRes, *exceptions.Exception)
 	Update(ctx *gin.Context, data dto.UpdateReq) *exceptions.Exception
 	Delete(ctx *gin.Context) *exceptions.Exception
+	FindOrders(ctx *gin.Context, params dto.OrderQueryParams) ([]dto.OrderRes, *exceptions.Exception) 
 }

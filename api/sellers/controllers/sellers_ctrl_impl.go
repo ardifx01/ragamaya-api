@@ -86,3 +86,23 @@ func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 		Message: "delete success",
 	})
 }
+
+func (h *CompControllersImpl) FindOrders(ctx *gin.Context) {
+	var queryParams dto.OrderQueryParams
+	if err := ctx.ShouldBindQuery(&queryParams); err != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewValidationException(err))
+		return
+	}
+
+	data, err := h.services.FindOrders(ctx, queryParams)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}	

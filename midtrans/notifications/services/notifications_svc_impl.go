@@ -65,6 +65,10 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 		return err
 	}
 
+	if orderData.Status == string(data.TransactionStatus) {
+		return nil
+	}
+
 	if !s.isValidStatusTransition(orderData.Status, string(data.TransactionStatus)) {
 		return exceptions.NewValidationException(fmt.Errorf("invalid status transition from %s to %s",
 			orderData.Status, string(data.TransactionStatus)))
@@ -73,10 +77,6 @@ func (s *CompServicesImpl) Payment(ctx *gin.Context, data dto.PaymentNotificatio
 	err = s.orderRepo.LockForUpdateWithTimeout(ctx, tx, data.OrderId, 5)
 	if err != nil {
 		return err
-	}
-
-	if orderData.Status == string(data.TransactionStatus) {
-		return nil
 	}
 
 	err = s.orderRepo.Update(ctx, tx, models.Orders{UUID: data.OrderId, Status: string(data.TransactionStatus)})

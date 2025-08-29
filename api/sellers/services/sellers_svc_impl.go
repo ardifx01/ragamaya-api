@@ -144,3 +144,31 @@ func (s *CompServicesImpl) Delete(ctx *gin.Context) *exceptions.Exception {
 
 	return nil
 }
+
+func (s *CompServicesImpl) FindOrders(ctx *gin.Context, params dto.OrderQueryParams) ([]dto.OrderRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(params)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if userData.SellerProfile.UUID == "" {
+		return nil, exceptions.NewException(403, "unauthorized access to seller orders")
+	}
+
+	result, err := s.repo.FindOrderBySellerUUID(ctx, s.DB, userData.SellerProfile.UUID, params)
+	if err != nil {
+		return nil, err
+	}
+
+	var output []dto.OrderRes
+	for _, order := range result {
+		output = append(output, mapper.MapSellerOrderMTO(order))
+	}
+
+	return output, nil
+}

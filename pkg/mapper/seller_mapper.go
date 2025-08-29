@@ -27,3 +27,11 @@ func MapSellerMTO(input models.Sellers) dto.SellerRes {
 	mapstructure.Decode(input, &output)
 	return output
 }
+
+func MapSellerOrderMTO(input models.Orders) dto.OrderRes {
+	var output dto.OrderRes
+
+	mapstructure.Decode(input, &output)
+	return output
+}
+

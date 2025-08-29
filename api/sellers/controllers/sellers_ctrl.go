@@ -7,4 +7,5 @@ type CompControllers interface {
 	FindByUUID(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	FindOrders(ctx *gin.Context)
 }

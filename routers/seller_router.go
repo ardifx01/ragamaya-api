@@ -14,5 +14,7 @@ func SellerRoutes(r *gin.RouterGroup, compControllers controllers.CompController
 		sellerGroup.POST("/register", middleware.AuthMiddleware(), compControllers.Register)
 		sellerGroup.PATCH("/update", middleware.SellerMiddleware(), compControllers.Update)
 		sellerGroup.DELETE("/delete", middleware.SellerMiddleware(), compControllers.Delete)
+		
+		sellerGroup.GET("/order", middleware.SellerMiddleware(), compControllers.FindOrders)
 	}
 }

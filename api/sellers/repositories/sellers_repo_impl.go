@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"ragamaya-api/api/sellers/dto"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 
@@ -56,4 +57,36 @@ func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string
 		return exceptions.ParseGormError(tx, err)
 	}
 	return nil
+}
+
+func (r *CompRepositoriesImpl) FindOrderBySellerUUID(ctx *gin.Context, tx *gorm.DB, uuid string, params dto.OrderQueryParams) ([]models.Orders, *exceptions.Exception) {
+	var orders []models.Orders
+	query := tx.WithContext(ctx).
+		Model(&models.Orders{}).
+		Joins("JOIN products ON products.uuid = orders.product_uuid").
+		Joins("JOIN sellers ON sellers.uuid = products.seller_uuid").
+		Where("sellers.uuid = ?", uuid).
+		Preload("Product").
+		Preload("User")
+
+	if params.Status != "" {
+		if params.Status == "success" {
+			query = query.Where("orders.status = ? OR orders.status = ?", "capture", "settlement")
+		} else if params.Status == "pending" {
+			query = query.Where("orders.status = ?", "pending")
+		} else if params.Status == "failed" {
+			query = query.Where("orders.status = ? OR orders.status = ? OR orders.status = ? OR orders.status = ?", "expire", "deny", "cancel", "failure")
+		}
+	}
+
+	if params.ProductUUID != "" {
+		query = query.Where("orders.product_uuid = ?", params.ProductUUID)
+	}
+
+	err := query.Order("orders.created_at DESC").
+		Find(&orders).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return orders, nil
 }

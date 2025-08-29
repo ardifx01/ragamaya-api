@@ -25,7 +25,7 @@ import (
 
 func main() {
 	godotenv.Load()
-	config.InitEnvCheck()
+	config.InitConfig()
 	config.InitRedis()
 
 	port := os.Getenv("PORT")

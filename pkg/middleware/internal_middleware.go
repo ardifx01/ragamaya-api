@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"os"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"strings"
@@ -14,7 +13,7 @@ import (
 func InternalMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		JWT_SECRET := config.GetJWTSecret()
-		ADMIN_USERNAME := os.Getenv("ADMIN_USERNAME")
+		ADMIN_USERNAME := config.GetAdminUsername()
 
 		var secretKey = []byte(JWT_SECRET)
 

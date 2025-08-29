@@ -27,6 +27,10 @@ type Config struct {
 	MIDTRANS_SERVER_KEY string
 	MIDTRANS_ENV        string
 	FRONTEND_BASE_URL   string
+	SMTP_EMAIL          string
+	SMTP_PASSWORD       string
+	SMTP_SERVER         string
+	SMTP_PORT           string
 }
 
 var globalConfig *Config
@@ -53,6 +57,10 @@ func InitConfig() {
 		MIDTRANS_SERVER_KEY: getEnv("MIDTRANS_SERVER_KEY"),
 		MIDTRANS_ENV:        getEnv("MIDTRANS_ENV"),
 		FRONTEND_BASE_URL:   getEnv("FRONTEND_BASE_URL"),
+		SMTP_EMAIL:          getEnv("SMTP_EMAIL"),
+		SMTP_PASSWORD:       getEnv("SMTP_PASSWORD"),
+		SMTP_SERVER:         getEnv("SMTP_SERVER"),
+		SMTP_PORT:           getEnv("SMTP_PORT"),
 	}
 
 	globalConfig = config
@@ -87,6 +95,10 @@ func GetStorageFolder() string     { return GetConfig().STORAGE_FOLDER }
 func GetMidtransServerKey() string { return GetConfig().MIDTRANS_SERVER_KEY }
 func GetMidtransEnv() string       { return GetConfig().MIDTRANS_ENV }
 func GetFrontendBaseURL() string   { return GetConfig().FRONTEND_BASE_URL }
+func GetEmail() string             { return GetConfig().SMTP_EMAIL }
+func GetEmailPassword() string     { return GetConfig().SMTP_PASSWORD }
+func GetEmailServer() string       { return GetConfig().SMTP_SERVER }
+func GetEmailPort() string         { return GetConfig().SMTP_PORT }
 
 func IsProduction() bool         { return GetEnvironment() == "production" }
 func IsDevelopment() bool        { return GetEnvironment() == "development" }

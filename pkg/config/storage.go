@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"log"
-	"os"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -14,9 +13,9 @@ import (
 func InitStorage() *s3.Client {
 	godotenv.Load()
 
-	awsAccessKey := os.Getenv("AWS_ACCESS_KEY")
-	awsSecretKey := os.Getenv("AWS_SECRET_KEY")
-	awsRegion := os.Getenv("AWS_REGION")
+	awsAccessKey := GetAWSAccessKey()
+	awsSecretKey := GetAWSSecretKey()
+	awsRegion := GetAWSRegion()
 
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion(awsRegion),

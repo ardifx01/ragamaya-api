@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"os"
 	"ragamaya-api/pkg/exceptions"
 
 	"github.com/go-redis/redis/v8"
@@ -12,8 +11,8 @@ var RedisClient *redis.Client
 
 func InitRedis() *exceptions.Exception {
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_ADDR"),
-		Password: os.Getenv("REDIS_PASS"),
+		Addr:     GetRedisAddr(),
+		Password: GetRedisPass(),
 		DB:       0,
 	})
 

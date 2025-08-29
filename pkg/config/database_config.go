@@ -3,9 +3,8 @@ package config
 import (
 	"fmt"
 	"log"
-	"os"
-	"time"
 	"ragamaya-api/pkg/logger"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -27,14 +26,14 @@ func InitDB() *gorm.DB {
 	start := time.Now()
 
 	dbConfig := DBConfig{
-		User:     os.Getenv("DB_USER"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		Name:     os.Getenv("DB_NAME"),
+		User:     GetDBUser(),
+		Password: GetDBPassword(),
+		Host:     GetDBHost(),
+		Port:     GetDBPort(),
+		Name:     GetDBName(),
 	}
 
-	dbURI := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name)
+	dbURI := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s TimeZone=Asia/Jakarta", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name)
 	connection, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
 		Logger: GORMLogger.Default.LogMode(GORMLogger.Info),
 	})

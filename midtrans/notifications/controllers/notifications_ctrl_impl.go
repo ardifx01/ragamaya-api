@@ -3,9 +3,9 @@ package controllers
 import (
 	"crypto/hmac"
 	"net/http"
-	"os"
 	"ragamaya-api/midtrans/notifications/dto"
 	"ragamaya-api/midtrans/notifications/services"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 
@@ -31,7 +31,7 @@ func (h *CompControllersImpl) Payment(ctx *gin.Context) {
 		return
 	}
 
-	serverKey := os.Getenv("MIDTRANS_SERVER_KEY")
+	serverKey := config.GetMidtransServerKey()
 	dataString := data.OrderId + data.StatusCode + data.GrossAmount + serverKey
 	calculatedSignature := helpers.EncryptToSHA512(dataString)
 

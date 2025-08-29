@@ -2,7 +2,6 @@ package services
 
 import (
 	"net/http"
-	"os"
 	"ragamaya-api/internal/auth/dto"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
@@ -31,8 +30,8 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.Login) (*string, *ex
 		return nil, exceptions.NewValidationException(validateErr)
 	}
 
-	ADMIN_USERNAME := os.Getenv("ADMIN_USERNAME")
-	ADMIN_PASSWORD := os.Getenv("ADMIN_PASSWORD")
+	ADMIN_USERNAME := config.GetAdminUsername()
+	ADMIN_PASSWORD := config.GetAdminPassword()
 
 	if data.Username != ADMIN_USERNAME || data.Password != ADMIN_PASSWORD {
 		return nil, exceptions.NewException(http.StatusUnauthorized, exceptions.ErrInvalidCredentials)

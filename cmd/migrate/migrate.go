@@ -11,7 +11,6 @@ func main() {
 	err := db.AutoMigrate(
 		&models.Users{},
 		&models.Sellers{},
-		&models.Clients{},
 		&models.RefreshToken{},
 		&models.BlacklistedToken{},
 		&models.VerificationToken{},

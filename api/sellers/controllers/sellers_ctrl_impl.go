@@ -108,5 +108,15 @@ func (h *CompControllersImpl) FindOrders(ctx *gin.Context) {
 }	
 
 func (h *CompControllersImpl) Analytics(ctx *gin.Context) {
-	// to be implemented
+	data, err := h.services.Analytics(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
 }

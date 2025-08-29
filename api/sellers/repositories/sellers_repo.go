@@ -16,4 +16,5 @@ type CompRepositories interface {
 	Update(ctx *gin.Context, tx *gorm.DB, data models.Sellers) *exceptions.Exception
 	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	FindOrderBySellerUUID(ctx *gin.Context, tx *gorm.DB, uuid string, params dto.OrderQueryParams) ([]models.Orders, *exceptions.Exception) 
+	Analytics(ctx *gin.Context, tx *gorm.DB, sellerUUID string) (*dto.AnalyticsRes, *exceptions.Exception)
 }

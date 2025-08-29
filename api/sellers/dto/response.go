@@ -16,7 +16,6 @@ type SellerRes struct {
 	CreatedAt string `json:"created_at"`
 }
 
-
 type OrderRes struct {
 	UUID        string `json:"uuid"`
 	UserUUID    string `json:"user_uuid"`
@@ -53,4 +52,24 @@ type UserRes struct {
 	SUB             string `json:"sub"`
 	Name            string `json:"name"`
 	AvatarURL       string `json:"avatar_url"`
+}
+
+type AnalyticsRes struct {
+	TotalProducts        int64               `json:"total_products"`
+	TotalOrders          int64               `json:"total_orders"`
+	TotalRevenue         int64               `json:"total_revenue"`
+	TotalRevenueCurrency string              `json:"total_revenue_currency"`
+	MonthlyRevenue       []MonthlyRevenueRes `json:"monthly_revenue"`
+	MonthlyOrders        []MonthlyOrdersRes  `json:"monthly_orders"`
+}
+
+type MonthlyRevenueRes struct {
+	Month    string `json:"month"`
+	Revenue  int64  `json:"revenue"`
+	Currency string `json:"currency"`
+}
+
+type MonthlyOrdersRes struct {
+	Month       string `json:"month"`
+	TotalOrders int64  `json:"total_orders"`
 }

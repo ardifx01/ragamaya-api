@@ -172,3 +172,21 @@ func (s *CompServicesImpl) FindOrders(ctx *gin.Context, params dto.OrderQueryPar
 
 	return output, nil
 }
+
+func (s *CompServicesImpl) Analytics(ctx *gin.Context) (*dto.AnalyticsRes, *exceptions.Exception) {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if userData.SellerProfile.UUID == "" {
+		return nil, exceptions.NewException(403, "unauthorized access to seller analytics")
+	}
+
+	result, err := s.repo.Analytics(ctx, s.DB, userData.SellerProfile.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

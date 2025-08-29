@@ -4,13 +4,13 @@ import (
 	"ragamaya-api/api/users/dto"
 	"ragamaya-api/api/users/repositories"
 	"ragamaya-api/models"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/logger"
 
 	walletRepo "ragamaya-api/api/wallets/repositories"
 
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -106,7 +106,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.LoginRequest) (*dto.
 		}
 	}
 
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret := config.GetJWTSecret()
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["uuid"] = user.UUID
@@ -155,7 +155,7 @@ func (s *CompServicesImpl) RefreshToken(ctx *gin.Context, refreshToken string) (
 		return "", err
 	}
 
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret := config.GetJWTSecret()
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["uuid"] = user.UUID
@@ -179,7 +179,7 @@ func (s *CompServicesImpl) Logout(ctx *gin.Context, accessToken, refreshToken st
 	tx := s.DB.Begin()
 
 	claims := jwt.MapClaims{}
-	jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret := config.GetJWTSecret()
 	_, err := jwt.ParseWithClaims(accessToken, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtSecret), nil
 	})

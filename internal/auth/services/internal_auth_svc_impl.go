@@ -3,9 +3,10 @@ package services
 import (
 	"net/http"
 	"os"
-	"time"
 	"ragamaya-api/internal/auth/dto"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -37,7 +38,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.Login) (*string, *ex
 		return nil, exceptions.NewException(http.StatusUnauthorized, exceptions.ErrInvalidCredentials)
 	}
 
-	JWT_SECRET := os.Getenv("JWT_SECRET")
+	JWT_SECRET := config.GetJWTSecret()
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 

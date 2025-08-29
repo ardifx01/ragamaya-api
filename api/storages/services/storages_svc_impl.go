@@ -3,9 +3,9 @@ package services
 import (
 	"bytes"
 	"net/http"
-	"os"
 	"ragamaya-api/api/storages/dto"
 	"ragamaya-api/api/storages/repositories"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/mapper"
 
@@ -35,8 +35,8 @@ func NewComponentServices(compRepositories repositories.CompRepositories, db *go
 }
 
 func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.FilesInput) (*dto.FilesOutput, *exceptions.Exception) {
-	AWS_BUCKET := os.Getenv("AWS_BUCKET")
-	AWS_FOLDER := os.Getenv("STORAGE_FOLDER")
+	AWS_BUCKET := config.GetAWSBucket()
+	AWS_FOLDER := config.GetStorageFolder()
 
 	input := mapper.MapFilesInputToModel(data)
 	input.UUID = uuid.NewString()

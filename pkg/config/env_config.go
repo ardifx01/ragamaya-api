@@ -3,61 +3,56 @@ package config
 import (
 	"os"
 
-	"github.com/joho/godotenv"
 	"ragamaya-api/pkg/logger"
 )
 
 type Config struct {
-	DBUser            string
-	DBPassword        string
-	DBHost            string
-	DBPort            string
-	DBName            string
-	Port              string
-	JWTSecret         string
-	Environment       string
-	AdminUsername     string
-	AdminPassword     string
-	RedisAddr         string
-	RedisPass         string
-	AWSAccessKey      string
-	AWSSecretKey      string
-	AWSRegion         string
-	AWSBucket         string
-	StorageFolder     string
-	MidtransServerKey string
-	MidtransEnv       string
+	DB_USER             string
+	DB_PASSWORD         string
+	DB_HOST             string
+	DB_PORT             string
+	DB_NAME             string
+	PORT                string
+	JWT_SECRET          string
+	ENVIRONMENT         string
+	ADMIN_USERNAME      string
+	ADMIN_PASSWORD      string
+	REDIS_ADDR          string
+	REDIS_PASS          string
+	AWS_ACCESS_KEY      string
+	AWS_SECRET_KEY      string
+	AWS_REGION          string
+	AWS_BUCKET          string
+	STORAGE_FOLDER      string
+	MIDTRANS_SERVER_KEY string
+	MIDTRANS_ENV        string
+	FRONTEND_BASE_URL   string
 }
 
 var globalConfig *Config
 
 func InitConfig() {
-	if err := godotenv.Load(); err != nil {
-		logger.PanicError("No .env file found, using system environment variables")
-	} else {
-		logger.Info("Loaded .env file")
-	}
-
 	config := &Config{
-		DBUser:            getEnv("DB_USER"),
-		DBPassword:        getEnv("DB_PASSWORD"),
-		DBHost:            getEnv("DB_HOST"),
-		DBPort:            getEnv("DB_PORT"),
-		DBName:            getEnv("DB_NAME"),
-		Port:              getEnv("PORT"),
-		JWTSecret:         getEnv("JWT_SECRET"),
-		Environment:       getEnv("ENVIRONMENT"),
-		AdminUsername:     getEnv("ADMIN_USERNAME"),
-		AdminPassword:     getEnv("ADMIN_PASSWORD"),
-		RedisAddr:         getEnv("REDIS_ADDR"),
-		RedisPass:         getEnv("REDIS_PASS"),
-		AWSAccessKey:      getEnv("AWS_ACCESS_KEY"),
-		AWSSecretKey:      getEnv("AWS_SECRET_KEY"),
-		AWSRegion:         getEnv("AWS_REGION"),
-		AWSBucket:         getEnv("AWS_BUCKET"),
-		StorageFolder:     getEnv("STORAGE_FOLDER"),
-		MidtransServerKey: getEnv("MIDTRANS_SERVER_KEY"),
-		MidtransEnv:       getEnv("MIDTRANS_ENV"),
+		DB_USER:             getEnv("DB_USER"),
+		DB_PASSWORD:         getEnv("DB_PASSWORD"),
+		DB_HOST:             getEnv("DB_HOST"),
+		DB_PORT:             getEnv("DB_PORT"),
+		DB_NAME:             getEnv("DB_NAME"),
+		PORT:                getEnv("PORT"),
+		JWT_SECRET:          getEnv("JWT_SECRET"),
+		ENVIRONMENT:         getEnv("ENVIRONMENT"),
+		ADMIN_USERNAME:      getEnv("ADMIN_USERNAME"),
+		ADMIN_PASSWORD:      getEnv("ADMIN_PASSWORD"),
+		REDIS_ADDR:          getEnv("REDIS_ADDR"),
+		REDIS_PASS:          getEnv("REDIS_PASS"),
+		AWS_ACCESS_KEY:      getEnv("AWS_ACCESS_KEY"),
+		AWS_SECRET_KEY:      getEnv("AWS_SECRET_KEY"),
+		AWS_REGION:          getEnv("AWS_REGION"),
+		AWS_BUCKET:          getEnv("AWS_BUCKET"),
+		STORAGE_FOLDER:      getEnv("STORAGE_FOLDER"),
+		MIDTRANS_SERVER_KEY: getEnv("MIDTRANS_SERVER_KEY"),
+		MIDTRANS_ENV:        getEnv("MIDTRANS_ENV"),
+		FRONTEND_BASE_URL:   getEnv("FRONTEND_BASE_URL"),
 	}
 
 	globalConfig = config
@@ -72,25 +67,26 @@ func GetConfig() *Config {
 	return globalConfig
 }
 
-func GetDBUser() string            { return GetConfig().DBUser }
-func GetDBPassword() string        { return GetConfig().DBPassword }
-func GetDBHost() string            { return GetConfig().DBHost }
-func GetDBPort() string            { return GetConfig().DBPort }
-func GetDBName() string            { return GetConfig().DBName }
-func GetPort() string              { return GetConfig().Port }
-func GetJWTSecret() string         { return GetConfig().JWTSecret }
-func GetEnvironment() string       { return GetConfig().Environment }
-func GetAdminUsername() string     { return GetConfig().AdminUsername }
-func GetAdminPassword() string     { return GetConfig().AdminPassword }
-func GetRedisAddr() string         { return GetConfig().RedisAddr }
-func GetRedisPass() string         { return GetConfig().RedisPass }
-func GetAWSAccessKey() string      { return GetConfig().AWSAccessKey }
-func GetAWSSecretKey() string      { return GetConfig().AWSSecretKey }
-func GetAWSRegion() string         { return GetConfig().AWSRegion }
-func GetAWSBucket() string         { return GetConfig().AWSBucket }
-func GetStorageFolder() string     { return GetConfig().StorageFolder }
-func GetMidtransServerKey() string { return GetConfig().MidtransServerKey }
-func GetMidtransEnv() string       { return GetConfig().MidtransEnv }
+func GetDBUser() string            { return GetConfig().DB_USER }
+func GetDBPassword() string        { return GetConfig().DB_PASSWORD }
+func GetDBHost() string            { return GetConfig().DB_HOST }
+func GetDBPort() string            { return GetConfig().DB_PORT }
+func GetDBName() string            { return GetConfig().DB_NAME }
+func GetPort() string              { return GetConfig().PORT }
+func GetJWTSecret() string         { return GetConfig().JWT_SECRET }
+func GetEnvironment() string       { return GetConfig().ENVIRONMENT }
+func GetAdminUsername() string     { return GetConfig().ADMIN_USERNAME }
+func GetAdminPassword() string     { return GetConfig().ADMIN_PASSWORD }
+func GetRedisAddr() string         { return GetConfig().REDIS_ADDR }
+func GetRedisPass() string         { return GetConfig().REDIS_PASS }
+func GetAWSAccessKey() string      { return GetConfig().AWS_ACCESS_KEY }
+func GetAWSSecretKey() string      { return GetConfig().AWS_SECRET_KEY }
+func GetAWSRegion() string         { return GetConfig().AWS_REGION }
+func GetAWSBucket() string         { return GetConfig().AWS_BUCKET }
+func GetStorageFolder() string     { return GetConfig().STORAGE_FOLDER }
+func GetMidtransServerKey() string { return GetConfig().MIDTRANS_SERVER_KEY }
+func GetMidtransEnv() string       { return GetConfig().MIDTRANS_ENV }
+func GetFrontendBaseURL() string   { return GetConfig().FRONTEND_BASE_URL }
 
 func IsProduction() bool         { return GetEnvironment() == "production" }
 func IsDevelopment() bool        { return GetEnvironment() == "development" }

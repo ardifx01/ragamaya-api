@@ -28,8 +28,7 @@ func main() {
 	config.InitConfig()
 	config.InitRedis()
 
-	port := os.Getenv("PORT")
-	environment := os.Getenv("ENVIRONMENT")
+	port := config.GetPort()
 
 	r := gin.New()
 	r.Use(middleware.RequestResponseLogger())
@@ -61,13 +60,10 @@ func main() {
 	routers.CompRouters(api, db, storage, validate, midtransCore)
 
 	var host string
-	switch environment {
-	case "development":
-		host = "localhost"
-	case "production":
+	if config.IsProduction() {
 		host = "0.0.0.0"
-	default:
-		panic("ENV ERROR: {ENVIRONMENT} UNKNOWN")
+	} else {
+		host = "localhost"
 	}
 
 	server := host + ":" + port

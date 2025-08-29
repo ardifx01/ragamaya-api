@@ -9,6 +9,7 @@ import (
 	"ragamaya-api/api/orders/dto"
 	"ragamaya-api/api/orders/repositories"
 	"ragamaya-api/models"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
@@ -219,7 +220,7 @@ func (s *CompServicesImpl) createChargeRequest(order *models.Orders, userData *u
 			Unit:           "minute",
 		},
 		ShopeePay: &coreapi.ShopeePayDetails{
-			CallbackUrl: fmt.Sprintf("%s/payments/%s", os.Getenv("FRONTEND_BASE_URL"), order.UUID),
+			CallbackUrl: fmt.Sprintf("%s/payments/%s", config.GetFrontendBaseURL(), order.UUID),
 		},
 	}
 

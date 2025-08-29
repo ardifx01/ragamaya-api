@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"net/http"
-	"os"
 	"ragamaya-api/api/users/dto"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"strings"
@@ -14,7 +14,7 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		secret := os.Getenv("JWT_SECRET")
+		secret := config.GetJWTSecret()
 		var secretKey = []byte(secret)
 
 		authHeader := c.GetHeader("Authorization")
@@ -69,7 +69,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 func SellerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		secret := os.Getenv("JWT_SECRET")
+		secret := config.GetJWTSecret()
 		var secretKey = []byte(secret)
 
 		authHeader := c.GetHeader("Authorization")

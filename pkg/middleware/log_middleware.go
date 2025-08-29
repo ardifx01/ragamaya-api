@@ -6,14 +6,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/url"
-	"ragamaya-api/models"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mssola/user_agent"
-	"gorm.io/gorm"
 )
 
 const (
@@ -50,40 +46,6 @@ func colorStatus(status int) string {
 		return Red + fmt.Sprintf("%d", status) + Reset
 	default:
 		return fmt.Sprintf("%d", status)
-	}
-}
-
-func ClientTracker(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		go func() {
-			clientIP := c.ClientIP()
-
-			userAgent := c.Request.Header.Get("User-Agent")
-			ua := user_agent.New(userAgent)
-			name, version := ua.Browser()
-
-			referer := c.Request.Referer()
-
-			path := c.Request.URL.Path
-			rawQuery := c.Request.URL.RawQuery
-
-			fullURL := url.URL{
-				Path:     path,
-				RawQuery: rawQuery,
-			}
-
-			data := models.Clients{
-				IP:      clientIP,
-				Browser: name,
-				Version: version,
-				OS:      ua.OS(),
-				Device:  ua.Platform(),
-				Origin:  referer,
-				API:     fullURL.String(),
-			}
-
-			db.Create(&data)
-		}()
 	}
 }
 

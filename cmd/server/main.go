@@ -14,7 +14,6 @@ import (
 
 	internalRouters "ragamaya-api/internal/routers"
 	midtransRouters "ragamaya-api/midtrans/routers"
-	"ragamaya-api/pkg/helpers"
 
 	"github.com/didip/tollbooth/v7"
 	"github.com/didip/tollbooth/v7/limiter"
@@ -27,7 +26,7 @@ import (
 func main() {
 	godotenv.Load()
 	config.InitEnvCheck()
-	helpers.InitRedis()
+	config.InitRedis()
 
 	port := os.Getenv("PORT")
 	environment := os.Getenv("ENVIRONMENT")

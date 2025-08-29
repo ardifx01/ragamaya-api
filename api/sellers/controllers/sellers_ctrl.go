@@ -8,4 +8,5 @@ type CompControllers interface {
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
 	FindOrders(ctx *gin.Context)
+	Analytics(ctx *gin.Context) 
 }

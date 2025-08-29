@@ -67,6 +67,7 @@ func (r *CompRepositoriesImpl) FindOrderBySellerUUID(ctx *gin.Context, tx *gorm.
 		Joins("JOIN sellers ON sellers.uuid = products.seller_uuid").
 		Where("sellers.uuid = ?", uuid).
 		Preload("Product").
+		Preload("Product.Thumbnails").
 		Preload("User")
 
 	if params.Status != "" {

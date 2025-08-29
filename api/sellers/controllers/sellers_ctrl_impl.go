@@ -106,3 +106,7 @@ func (h *CompControllersImpl) FindOrders(ctx *gin.Context) {
 		Body:    data,
 	})
 }	
+
+func (h *CompControllersImpl) Analytics(ctx *gin.Context) {
+	// to be implemented
+}

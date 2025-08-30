@@ -34,7 +34,7 @@ func NewComponentServices(compRepositories repositories.CompRepositories, db *go
 	}
 }
 
-func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.FilesInput) (*dto.FilesOutput, *exceptions.Exception) {
+func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.FilesInput) (*dto.FilesRes, *exceptions.Exception) {
 	AWS_BUCKET := config.GetAWSBucket()
 	AWS_FOLDER := config.GetStorageFolder()
 
@@ -61,21 +61,21 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.FilesInput) (*dto.F
 		return nil, err
 	}
 
-	output := mapper.MapFilesModelToOutput(*result)
+	output := mapper.MapFilesMTO(*result)
 
 	return &output, nil
 }
 
-func (s *CompServicesImpl) FindAllImages(ctx *gin.Context) ([]dto.FilesOutput, *exceptions.Exception) {
+func (s *CompServicesImpl) FindAllImages(ctx *gin.Context) ([]dto.FilesRes, *exceptions.Exception) {
 	data, err := s.repo.FindAllImages(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	var output []dto.FilesOutput
+	var output []dto.FilesRes
 
 	for _, item := range *data {
-		output = append(output, mapper.MapFilesModelToOutput(item))
+		output = append(output, mapper.MapFilesMTO(item))
 	}
 
 	return output, nil

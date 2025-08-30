@@ -8,7 +8,7 @@ type Response struct {
 	Body    interface{} `json:"body,omitempty"`
 }
 
-type FilesOutput struct {
+type FilesRes struct {
 	UUID             string    `json:"uuid"`
 	PublicURL        string    `json:"public_url"`
 	OriginalFileName string    `json:"original_file_name"`

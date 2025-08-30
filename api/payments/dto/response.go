@@ -49,19 +49,19 @@ type PaymentRes struct {
 	CreatedAt time.Time  `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 
-	PaymentActions   []PaymentActionOutput   `json:"payment_actions,omitempty" mapstructure:"actions"`
-	PaymentVANumbers []PaymentVANumberOutput `json:"payment_va_numbers,omitempty" mapstructure:"va_numbers"`
+	PaymentActions   []PaymentActionRes   `json:"payment_actions,omitempty" mapstructure:"actions"`
+	PaymentVANumbers []PaymentVANumberRes `json:"payment_va_numbers,omitempty" mapstructure:"va_numbers"`
 
 	Product ProductRes `json:"product,omitempty"`
 }
 
-type PaymentActionOutput struct {
+type PaymentActionRes struct {
 	Name   string `json:"name"`
 	Method string `json:"method"`
 	Url    string `json:"url"`
 }
 
-type PaymentVANumberOutput struct {
+type PaymentVANumberRes struct {
 	Bank     string `json:"bank"`
 	VANumber string `json:"va_number"`
 }

@@ -1,9 +1,9 @@
 package mapper
 
 import (
-	"strconv"
 	"ragamaya-api/api/orders/dto"
 	"ragamaya-api/models"
+	"strconv"
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -54,7 +54,7 @@ func MapChargeResponseToPaymentModel(input coreapi.ChargeResponse) models.Paymen
 	return data
 }
 
-func MapOrderModelToChargeOutput(model models.Orders) dto.OrderChargeRes {
+func MapOrderMTCO(model models.Orders) dto.OrderChargeRes {
 	var output dto.OrderChargeRes
 	mapstructure.Decode(model, &output)
 	output.CreatedAt = model.CreatedAt

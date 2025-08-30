@@ -13,8 +13,8 @@ func MapFilesInputToModel(input dto.FilesInput) models.Files {
 	return data
 }
 
-func MapFilesModelToOutput(model models.Files) dto.FilesOutput {
-	var output dto.FilesOutput
+func MapFilesMTO(model models.Files) dto.FilesRes {
+	var output dto.FilesRes
 	mapstructure.Decode(model, &output)
 	output.CreatedAt = model.CreatedAt
 	return output

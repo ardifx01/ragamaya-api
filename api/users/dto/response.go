@@ -18,7 +18,7 @@ const (
 	Seller Roles = "seller"
 )
 
-type UserOutput struct {
+type UserRes struct {
 	UUID            string `json:"uuid"`
 	Email           string `json:"email"`
 	IsEmailVerified bool   `json:"is_email_verified"`

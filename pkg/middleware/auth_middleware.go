@@ -52,7 +52,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user := dto.UserOutput{
+		user := dto.UserRes{
 			UUID:            claims["uuid"].(string),
 			Email:           claims["email"].(string),
 			IsEmailVerified: claims["is_email_verified"].(bool),
@@ -124,7 +124,7 @@ func SellerMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user := dto.UserOutput{
+		user := dto.UserRes{
 			UUID:            claims["uuid"].(string),
 			Email:           claims["email"].(string),
 			IsEmailVerified: claims["is_email_verified"].(bool),

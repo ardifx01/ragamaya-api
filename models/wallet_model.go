@@ -43,6 +43,9 @@ type Wallet struct {
 	DeletedAt *time.Time `gorm:"index"`
 
 	TransactionHistory []WalletTransactionHistory `gorm:"foreignKey:WalletID;references:ID"`
+	PayoutRequests     []WalletPayoutRequest      `gorm:"foreignKey:WalletID;references:ID"`
+
+	User *Users `gorm:"foreignKey:UserUUID;references:UUID"`
 }
 
 type WalletTransactionHistory struct {
@@ -80,6 +83,8 @@ type WalletPayoutRequest struct {
 	DeletedAt *time.Time `gorm:"index"`
 
 	TransactionReceipt WalletPayoutTransactionReceipt `gorm:"foreignKey:PayoutUUID;references:UUID"`
+
+	Wallet *Wallet `gorm:"foreignKey:WalletID;references:ID"`
 }
 
 type WalletPayoutTransactionReceipt struct {

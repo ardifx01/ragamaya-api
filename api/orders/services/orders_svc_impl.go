@@ -94,12 +94,12 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.OrderReq) (*dto.Ord
 		return nil, err
 	}
 
-	output := mapper.MapOrderModelToChargeOutput(*orderResult)
+	output := mapper.MapOrderMTCO(*orderResult)
 
 	return &output, nil
 }
 
-func (s *CompServicesImpl) prepareOrder(ctx *gin.Context, tx *gorm.DB, data dto.OrderReq, userData *userDTO.UserOutput) (*models.Orders, *exceptions.Exception) {
+func (s *CompServicesImpl) prepareOrder(ctx *gin.Context, tx *gorm.DB, data dto.OrderReq, userData *userDTO.UserRes) (*models.Orders, *exceptions.Exception) {
 	productData, err := s.productRepo.FindByUUID(ctx, tx, data.ProductUUID)
 	if err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ func (s *CompServicesImpl) validateOrderQuantity(quantity int, ticketCategory *m
 	return nil
 }
 
-func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserOutput) *exceptions.Exception {
+func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserRes) *exceptions.Exception {
 	chargeReq := s.createChargeRequest(order, userData)
 
 	midtransRes, midtransErr := s.midtransCore.ChargeTransaction(chargeReq)
@@ -177,7 +177,7 @@ func (s *CompServicesImpl) processPayment(ctx *gin.Context, tx *gorm.DB, order *
 	return nil
 }
 
-func (s *CompServicesImpl) processFreePayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserOutput) *exceptions.Exception {
+func (s *CompServicesImpl) processFreePayment(ctx *gin.Context, tx *gorm.DB, order *models.Orders, userData *userDTO.UserRes) *exceptions.Exception {
 	var data models.Payments
 
 	data.UUID = uuid.NewString()
@@ -205,7 +205,7 @@ func (s *CompServicesImpl) processFreePayment(ctx *gin.Context, tx *gorm.DB, ord
 	return nil
 }
 
-func (s *CompServicesImpl) createChargeRequest(order *models.Orders, userData *userDTO.UserOutput) *coreapi.ChargeReq {
+func (s *CompServicesImpl) createChargeRequest(order *models.Orders, userData *userDTO.UserRes) *coreapi.ChargeReq {
 	baseCharge := &coreapi.ChargeReq{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  order.UUID,

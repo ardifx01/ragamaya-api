@@ -225,8 +225,13 @@ func (s *CompServicesImpl) FindAllPayouts(ctx *gin.Context) ([]dto.WalletPayoutR
 	}
 
 	var output []dto.WalletPayoutRes
-	for _, data := range result {
-		output = append(output, mapper.MapPayoutMTO(data))
+	for _, v := range result {
+		data := mapper.MapPayoutMTO(v)
+		data.User.UUID = v.Wallet.User.UUID
+		data.User.Email = v.Wallet.User.Email
+		data.User.Name = v.Wallet.User.Name
+		data.User.AvatarURL = v.Wallet.User.AvatarURL
+		output = append(output, data)
 	}
 
 	return output, nil

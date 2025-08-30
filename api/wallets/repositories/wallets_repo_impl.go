@@ -89,7 +89,11 @@ func (r *CompRepositoriesImpl) CreatePayoutRequest(ctx *gin.Context, tx *gorm.DB
 func (r *CompRepositoriesImpl) FindAllPayouts(ctx *gin.Context, tx *gorm.DB) ([]models.WalletPayoutRequest, *exceptions.Exception) {
 	var data []models.WalletPayoutRequest
 
-	err := tx.Preload("TransactionReceipt").Find(&data).Error
+	err := tx.
+		Preload("TransactionReceipt").
+		Preload("Wallet").
+		Preload("Wallet.User").
+		Find(&data).Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}

@@ -31,9 +31,17 @@ type WalletPayoutRes struct {
 	CreatedAt       time.Time `json:"created_at"`
 
 	TransactionReceipt WalletPayoutTransactionReceiptRes `json:"transaction_receipt,omitempty"`
+	User               UserRes                           `json:"user"`
 }
 
 type WalletPayoutTransactionReceiptRes struct {
 	ReceiptURL string `json:"receipt_url,omitempty"`
 	Note       string `json:"note,omitempty"`
+}
+
+type UserRes struct {
+	UUID            string `json:"uuid"`
+	Email           string `json:"email"`
+	Name            string `json:"name"`
+	AvatarURL       string `json:"avatar_url"`
 }

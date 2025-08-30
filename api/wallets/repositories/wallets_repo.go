@@ -16,6 +16,7 @@ type CompRepositories interface {
 	CreateTransaction(ctx *gin.Context, tx *gorm.DB, data models.WalletTransactionHistory) *exceptions.Exception
 	FindTransactionHistoryByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.WalletTransactionHistory, *exceptions.Exception)
 	CreatePayoutRequest(ctx *gin.Context, tx *gorm.DB, data models.WalletPayoutRequest) *exceptions.Exception
+	FindAllPayouts(ctx *gin.Context, tx *gorm.DB) ([]models.WalletPayoutRequest, *exceptions.Exception)
 	FindPayoutByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.WalletPayoutRequest, *exceptions.Exception)
 	FindPayoutByWalletID(ctx *gin.Context, tx *gorm.DB, id uint) (*models.WalletPayoutRequest, *exceptions.Exception)
 	FindPayoutByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.WalletPayoutRequest, *exceptions.Exception)

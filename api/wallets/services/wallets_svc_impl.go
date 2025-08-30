@@ -218,6 +218,20 @@ func (s *CompServicesImpl) RequestPayout(ctx *gin.Context, data dto.WalletPayout
 	return nil
 }
 
+func (s *CompServicesImpl) FindAllPayouts(ctx *gin.Context) ([]dto.WalletPayoutRes, *exceptions.Exception) {
+	result, err := s.repo.FindAllPayouts(ctx, s.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	var output []dto.WalletPayoutRes
+	for _, data := range result {
+		output = append(output, mapper.MapPayoutMTO(data))
+	}
+
+	return output, nil
+}
+
 func (s *CompServicesImpl) ResponsePayout(ctx *gin.Context, data dto.WalletPayoutAcceptReq) *exceptions.Exception {
 	validateErr := s.validate.Struct(data)
 	if validateErr != nil {

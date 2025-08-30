@@ -67,6 +67,20 @@ func (h *CompControllersImpl) RequestPayout(ctx *gin.Context) {
 	})
 }
 
+func (h *CompControllersImpl) FindAllPayouts(ctx *gin.Context) {
+	data, err := h.services.FindAllPayouts(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}
+
 func (h *CompControllersImpl) ResponsePayout(ctx *gin.Context) {
 	var data dto.WalletPayoutAcceptReq
 	jsonErr := ctx.ShouldBindJSON(&data)

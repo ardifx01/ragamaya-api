@@ -5,6 +5,7 @@ import (
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/services"
 	"ragamaya-api/pkg/exceptions"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -108,5 +109,30 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 		Message: "data retrieved successfully",
 		Body:    result,
 		Size:    len(result),
+	})
+}
+
+func (h *CompControllersImpl) DeleteThumbnail(ctx *gin.Context) {
+	productUUID := ctx.Query("product_uuid")
+	id, exc := strconv.ParseUint(ctx.Query("id"), 10, 64)
+	if exc != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+	
+	if productUUID == "" {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	err := h.services.DeleteThumbnail(ctx, productUUID, uint(id))
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "thumbnail deleted successfully",
 	})
 }

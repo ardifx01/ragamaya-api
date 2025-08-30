@@ -179,3 +179,11 @@ func (r *CompRepositoriesImpl) IsProductDigitalOwned(ctx *gin.Context, tx *gorm.
 	}
 	return true
 }
+
+func (r *CompRepositoriesImpl) DeleteThumbnail(ctx *gin.Context, tx *gorm.DB, productUUID string, id uint) *exceptions.Exception {
+	err := tx.Where("product_uuid = ?", productUUID).Where("id = ?", id).Where("deleted_at IS NULL").Delete(&models.ProductThumbnails{}).Error
+	if err != nil {
+		return exceptions.ParseGormError(tx, err)
+	}
+	return nil
+}

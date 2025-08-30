@@ -146,3 +146,26 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.ProductSearchReq) (
 
 	return output, nil
 }
+
+func (s *CompServicesImpl) DeleteThumbnail(ctx *gin.Context, productUUID string, id uint) *exceptions.Exception {
+	productData, err := s.repo.FindByUUID(ctx, s.DB, productUUID)
+	if err != nil {
+		return err
+	}
+
+	sellerData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	if productData.SellerUUID != sellerData.SellerProfile.UUID {
+		return exceptions.NewException(http.StatusForbidden, exceptions.ErrNotTheOwner)
+	}
+
+	result := s.repo.DeleteThumbnail(ctx, s.DB, productUUID, id)
+	if result != nil {
+		return result
+	}
+
+	return nil
+}

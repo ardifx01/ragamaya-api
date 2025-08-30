@@ -8,4 +8,5 @@ type CompControllers interface {
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
 	Search(ctx *gin.Context)
+	DeleteThumbnail(ctx *gin.Context)
 }

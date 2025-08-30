@@ -13,4 +13,5 @@ type CompServices interface {
 	Update(ctx *gin.Context, uuid string, data dto.ProductUpdateReq) *exceptions.Exception
 	Delete(ctx *gin.Context, uuid string) *exceptions.Exception
 	Search(ctx *gin.Context, data dto.ProductSearchReq) ([]dto.ProductRes, *exceptions.Exception)
+	DeleteThumbnail(ctx *gin.Context, productUUID string, id uint) *exceptions.Exception
 }

@@ -169,3 +169,5 @@ func (s *CompServicesImpl) DeleteThumbnail(ctx *gin.Context, productUUID string,
 
 	return nil
 }
+
+// func (s *CompServicesImpl) FindProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string) ([]models.Products, *exceptions.Exception)

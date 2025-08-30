@@ -129,12 +129,13 @@ func (r *CompRepositoriesImpl) Analytics(ctx *gin.Context, tx *gorm.DB, sellerUU
 				FROM months m
 				LEFT JOIN orders o 
 					ON TO_CHAR(o.created_at, 'YYYY-MM') = m.month
-				AND o.status = 'settlement'
+					AND o.status = 'settlement'
 				LEFT JOIN products p
 					ON p.uuid = o.product_uuid
-				AND p.seller_uuid = ?
+				WHERE p.seller_uuid = ?
+					OR p.seller_uuid IS NULL
 				GROUP BY m.month
-				ORDER BY m.month ASC
+				ORDER BY m.month ASC;
 			`
 	if err := tx.Raw(query, sellerUUID).Scan(&monthly).Error; err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
@@ -151,9 +152,11 @@ func (r *CompRepositoriesImpl) Analytics(ctx *gin.Context, tx *gorm.DB, sellerUU
 				FROM months m
 				LEFT JOIN orders o 
 					ON TO_CHAR(o.created_at, 'YYYY-MM') = m.month
+					AND o.status = 'settlement'
 				LEFT JOIN products p
 					ON p.uuid = o.product_uuid
-				AND p.seller_uuid = ?
+				WHERE p.seller_uuid = ?
+					OR p.seller_uuid IS NULL
 				GROUP BY m.month
 				ORDER BY m.month ASC
 			`

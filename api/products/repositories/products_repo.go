@@ -18,6 +18,7 @@ type CompRepositories interface {
 	DecrementStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	RestoreStockByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	CreateProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, data models.ProductDigitalOwned) *exceptions.Exception
+	FindProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string) ([]models.Products, *exceptions.Exception)
 	IsProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string, productUUID string) bool
 	DeleteThumbnail(ctx *gin.Context, tx *gorm.DB, productUUID string, id uint) *exceptions.Exception 
 }

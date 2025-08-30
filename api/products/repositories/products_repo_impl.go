@@ -72,7 +72,7 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, searchReq d
 		kw := fmt.Sprintf("%%%s%%", *searchReq.Keyword)
 		query = query.Where(
 			tx.Where("name ILIKE ?", kw).
-				Or("description ILIKE ?", kw).
+			Or("description ILIKE ?", kw).
 				Or("keywords ILIKE ?", kw),
 		)
 	}
@@ -104,7 +104,7 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, searchReq d
 	if searchReq.PageSize != nil {
 		pageSize = *searchReq.PageSize
 	}
-
+	
 	offset := (page - 1) * pageSize
 
 	if err := query.
@@ -166,6 +166,21 @@ func (r *CompRepositoriesImpl) CreateProductDigitalOwned(ctx *gin.Context, tx *g
 	}
 
 	return nil
+}
+
+func (r *CompRepositoriesImpl) FindProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string) ([]models.Products, *exceptions.Exception) {
+	var products []models.Products
+	err := tx.
+		Joins("JOIN product_digital_owneds ON product_digital_owneds.product_uuid = products.uuid").
+		Where("product_digital_owneds.user_uuid = ?", userUUID).
+		Preload("Thumbnails").
+		Preload("DigitalFiles").
+		Find(&products).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+
+	return products, nil
 }
 
 func (r *CompRepositoriesImpl) IsProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string, productUUID string) bool {

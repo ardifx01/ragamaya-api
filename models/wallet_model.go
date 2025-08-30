@@ -80,8 +80,6 @@ type WalletPayoutRequest struct {
 	DeletedAt *time.Time `gorm:"index"`
 
 	TransactionReceipt WalletPayoutTransactionReceipt `gorm:"foreignKey:PayoutUUID;references:UUID"`
-
-	User Users `gorm:"-:all"` // to hold user info when joining with wallet
 }
 
 type WalletPayoutTransactionReceipt struct {

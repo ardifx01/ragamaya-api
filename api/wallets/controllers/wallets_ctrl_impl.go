@@ -88,3 +88,17 @@ func (h *CompControllersImpl) ResponsePayout(ctx *gin.Context) {
 		Message: "response success",
 	})
 }
+
+func (h *CompControllersImpl) FindPayoutsByUserUUID(ctx *gin.Context) {
+	data, err := h.services.FindPayoutsByUserUUID(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}

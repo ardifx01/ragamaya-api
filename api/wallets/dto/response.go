@@ -20,3 +20,20 @@ type WalletTransactionRes struct {
 	Note      string    `json:"note"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type WalletPayoutRes struct {
+	UUID            string    `json:"uuid"`
+	Amount          int64     `json:"amount"`
+	Status          string    `json:"status"`
+	BankName        string    `json:"bank_name"`
+	BankAccount     string    `json:"bank_account"`
+	BankAccountName string    `json:"bank_account_name"`
+	CreatedAt       time.Time `json:"created_at"`
+
+	TransactionReceipt WalletPayoutTransactionReceiptRes `json:"transaction_receipt,omitempty"`
+}
+
+type WalletPayoutTransactionReceiptRes struct {
+	ReceiptURL string `json:"receipt_url,omitempty"`
+	Note       string `json:"note,omitempty"`
+}

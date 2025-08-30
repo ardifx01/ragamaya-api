@@ -3,9 +3,13 @@ package main
 import (
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/config"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+	config.InitConfig()
 	db := config.InitDB()
 
 	err := db.AutoMigrate(

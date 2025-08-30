@@ -108,6 +108,21 @@ func (r *CompRepositoriesImpl) FindPayoutByWalletID(ctx *gin.Context, tx *gorm.D
 	return &data, nil
 }
 
+func (r *CompRepositoriesImpl) FindPayoutByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.WalletPayoutRequest, *exceptions.Exception) {
+	var data []models.WalletPayoutRequest
+
+	err := tx.Joins("JOIN wallets ON wallets.id = wallet_payout_requests.wallet_id").
+		Where("wallets.user_uuid = ?", uuid).
+		Preload("TransactionReceipt").
+		Order("wallet_payout_requests.created_at DESC").
+		Find(&data).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+
+	return data, nil
+}
+
 func (r *CompRepositoriesImpl) UpdatePayout(ctx *gin.Context, tx *gorm.DB, data models.WalletPayoutRequest) *exceptions.Exception {
 	result := tx.Where("uuid = ?", data.UUID).Updates(&data)
 	if result.Error != nil {

@@ -74,7 +74,6 @@ type WalletPayoutRequest struct {
 	BankName        string       `gorm:"not null"`
 	BankAccount     string       `gorm:"not null"`
 	BankAccountName string       `gorm:"not null"`
-	TransferReceipt string
 
 	CreatedAt time.Time  `gorm:"not null"`
 	UpdatedAt time.Time  `gorm:"not null"`

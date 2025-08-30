@@ -301,3 +301,22 @@ func (s *CompServicesImpl) ResponsePayout(ctx *gin.Context, data dto.WalletPayou
 
 	return nil
 }
+
+func (s *CompServicesImpl) FindPayoutsByUserUUID(ctx *gin.Context) ([]dto.WalletPayoutRes, *exceptions.Exception) {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := s.repo.FindPayoutByUserUUID(ctx, s.DB, userData.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	var output []dto.WalletPayoutRes
+	for _, data := range result {
+		output = append(output, mapper.MapPayoutMTO(data))
+	}
+
+	return output, nil
+}

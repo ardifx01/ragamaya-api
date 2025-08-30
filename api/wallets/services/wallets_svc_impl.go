@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"ragamaya-api/api/wallets/dto"
 	"ragamaya-api/api/wallets/repositories"
+	emails "ragamaya-api/emails/services"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
@@ -271,6 +272,14 @@ func (s *CompServicesImpl) ResponsePayout(ctx *gin.Context, data dto.WalletPayou
 		if err != nil {
 			return err
 		}
+
+		go func() {
+			err = emails.PayoutNotificationEmail(payoutData.Wallet.User.Email, *payoutData)
+			if err != nil {
+				logger.Error("Failed to send payout notification email: %v", err)
+				return
+			}
+		}()
 
 	case string(models.Failed):
 		payoutData.Status = models.Failed

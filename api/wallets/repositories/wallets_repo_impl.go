@@ -104,7 +104,10 @@ func (r *CompRepositoriesImpl) FindAllPayouts(ctx *gin.Context, tx *gorm.DB) ([]
 func (r *CompRepositoriesImpl) FindPayoutByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.WalletPayoutRequest, *exceptions.Exception) {
 	var data models.WalletPayoutRequest
 
-	err := tx.Where("uuid = ?", uuid).First(&data).Error
+	err := tx.Where("uuid = ?", uuid).
+		Preload("Wallet").
+		Preload("Wallet.User").
+		First(&data).Error
 	if err != nil {
 		return nil, exceptions.ParseGormError(tx, err)
 	}

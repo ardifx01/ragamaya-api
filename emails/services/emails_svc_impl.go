@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"ragamaya-api/emails/dto"
+	"ragamaya-api/models"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"strconv"
@@ -77,6 +78,31 @@ func VerificationEmail(data dto.EmailVerification) *exceptions.Exception {
 	emailData := dto.EmailRequest{
 		Email:   data.Email,
 		Subject: "[Ragamaya] Email Verification for Account Activation",
+		Body:    body.String(),
+	}
+
+	err := SendEmail(emailData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func PayoutNotificationEmail(email string, data models.WalletPayoutRequest) *exceptions.Exception {
+	tmpl, exc := template.ParseFiles("emails/templates/payout_notification.html")
+	if exc != nil {
+		return exceptions.NewException(http.StatusInternalServerError, exc.Error())
+	}
+
+	var body bytes.Buffer
+	if exc := tmpl.Execute(&body, data); exc != nil {
+		return exceptions.NewException(http.StatusInternalServerError, exc.Error())
+	}
+
+	emailData := dto.EmailRequest{
+		Email:   email,
+		Subject: "[Ragamaya] Payout Notification",
 		Body:    body.String(),
 	}
 

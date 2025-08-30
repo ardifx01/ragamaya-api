@@ -17,11 +17,12 @@ type ProductRes struct {
 	Stock       int         `json:"stock" validate:"required"`
 	Keywords    string      `json:"keywords" validate:"required"`
 
-	Thumbnails   []ProductThumbnails   `json:"thumbnails" validate:"required,dive"`
+	Thumbnails   []ProductThumbnailsRes   `json:"thumbnails" validate:"required,dive"`
 	DigitalFiles []ProductDigitalFiles `json:"digital_files" validate:"required,dive"`
 }
 
 type ProductThumbnailsRes struct {
+	ID           int    `json:"id"`
 	ThumbnailURL string `json:"thumbnail_url" validate:"required,url"`
 }
 

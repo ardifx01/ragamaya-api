@@ -9,8 +9,15 @@ type WalletTransactionReq struct {
 }
 
 type WalletPayoutReq struct {
-	Amount          int64        `json:"amount" validate:"required,gte=50000"`
-	BankName        string       `json:"bank_name" validate:"required,oneof=bca bni bri mandiri"`
-	BankAccount     string       `json:"bank_account" validate:"required,number"`
-	BankAccountName string       `json:"bank_account_name" validate:"required"`
+	Amount          int64  `json:"amount" validate:"required,gte=50000"`
+	BankName        string `json:"bank_name" validate:"required,oneof=bca bni bri mandiri"`
+	BankAccount     string `json:"bank_account" validate:"required,number"`
+	BankAccountName string `json:"bank_account_name" validate:"required"`
+}
+
+type WalletPayoutAcceptReq struct {
+	Status     string `validate:"required,oneof=completed failed"`
+	PayoutUUID string `json:"payout_uuid" validate:"required,uuid4"`
+	ReceiptURL string `json:"receipt_url" validate:"required,url"`
+	Note       string `json:"note" validate:"required"`
 }

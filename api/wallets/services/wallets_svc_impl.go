@@ -217,3 +217,87 @@ func (s *CompServicesImpl) RequestPayout(ctx *gin.Context, data dto.WalletPayout
 
 	return nil
 }
+
+func (s *CompServicesImpl) ResponsePayout(ctx *gin.Context, data dto.WalletPayoutAcceptReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	payoutData, err := s.repo.FindPayoutByUUID(ctx, tx, data.PayoutUUID)
+	if err != nil {
+		return err
+	}
+
+	if payoutData.Status != models.Pending {
+		return exceptions.NewValidationException(fmt.Errorf("payout already processed"))
+	}
+
+	switch data.Status {
+	case string(models.Completed):
+		payoutData.Status = models.Completed
+		err = s.repo.UpdatePayout(ctx, tx, *payoutData)
+		if err != nil {
+			return err
+		}
+
+		err = s.repo.CreatePayoutTransactionReceipt(ctx, tx, models.WalletPayoutTransactionReceipt{
+			PayoutUUID: payoutData.UUID,
+			ReceiptURL: data.ReceiptURL,
+			Note:       data.Note,
+		})
+		if err != nil {
+			return err
+		}
+
+	case string(models.Failed):
+		payoutData.Status = models.Failed
+		err = s.repo.UpdatePayout(ctx, tx, *payoutData)
+		if err != nil {
+			return err
+		}
+
+		err = s.repo.CreatePayoutTransactionReceipt(ctx, tx, models.WalletPayoutTransactionReceipt{
+			PayoutUUID: payoutData.UUID,
+			ReceiptURL: data.ReceiptURL,
+			Note:       data.Note,
+		})
+		if err != nil {
+			return err
+		}
+
+		walletData, err := s.repo.FindByID(ctx, tx, payoutData.WalletID)
+		if err != nil {
+			return err
+		}
+
+		err = s.repo.CreateTransaction(ctx, tx, models.WalletTransactionHistory{
+			UUID:      uuid.NewString(),
+			WalletID:  walletData.ID,
+			Amount:    payoutData.Amount,
+			Type:      models.Debit,
+			Reference: "Payout Rejected " + payoutData.UUID,
+			Note:      "Payout rejected, refund to wallet",
+		})
+		if err != nil {
+			return err
+		}
+
+		err = s.repo.UpdateBalance(ctx, tx, models.Wallet{
+			UserUUID: walletData.UserUUID,
+			Balance:  walletData.Balance + payoutData.Amount,
+		})
+		if err != nil {
+			return err
+		}
+
+	default:
+		tx.Rollback()
+		return exceptions.NewValidationException(fmt.Errorf("invalid status"))
+	}
+
+	return nil
+}

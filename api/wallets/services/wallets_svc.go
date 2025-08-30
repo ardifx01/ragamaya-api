@@ -14,4 +14,5 @@ type CompServices interface {
 	CreateTransaction(ctx *gin.Context, input dto.WalletTransactionReq) *exceptions.Exception
 	CreateTransactionWithTx(ctx *gin.Context, tx *gorm.DB,  input dto.WalletTransactionReq) *exceptions.Exception 
 	RequestPayout(ctx *gin.Context, data dto.WalletPayoutReq) *exceptions.Exception
+	ResponsePayout(ctx *gin.Context, data dto.WalletPayoutAcceptReq) *exceptions.Exception
 }

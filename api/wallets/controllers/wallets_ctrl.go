@@ -6,4 +6,5 @@ type CompControllers interface {
 	FindByUserUUID(ctx *gin.Context)
 	FindTransactionHistoryByUserUUID(ctx *gin.Context)
 	RequestPayout(ctx *gin.Context)
+	ResponsePayout(ctx *gin.Context) 
 }

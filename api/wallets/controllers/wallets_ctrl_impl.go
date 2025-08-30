@@ -66,3 +66,25 @@ func (h *CompControllersImpl) RequestPayout(ctx *gin.Context) {
 		Message: "request success",
 	})
 }
+
+func (h *CompControllersImpl) ResponsePayout(ctx *gin.Context) {
+	var data dto.WalletPayoutAcceptReq
+	jsonErr := ctx.ShouldBindJSON(&data)
+	if jsonErr != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	data.Status = ctx.Param("status")
+
+	err := h.services.ResponsePayout(ctx, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "response success",
+	})
+}

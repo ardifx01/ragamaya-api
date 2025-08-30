@@ -16,5 +16,11 @@ func StorageRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 			imageGroup.POST("/upload", compControllers.Images)
 			imageGroup.POST("/upload/single", compControllers.Image)
 		}
+
+		generalGroup := storageGroup.Group("/general")
+		generalGroup.Use(middleware.SellerMiddleware())
+		{
+			generalGroup.POST("/upload", compControllers.General)
+		}
 	}
 }

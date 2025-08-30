@@ -5,5 +5,6 @@ import "github.com/gin-gonic/gin"
 type CompControllers interface {
 	Images(ctx *gin.Context)
 	Image(ctx *gin.Context)
+	General(ctx *gin.Context) 
 	FindAllImages(ctx *gin.Context)
 }

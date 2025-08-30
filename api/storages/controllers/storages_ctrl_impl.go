@@ -169,10 +169,72 @@ func (h *CompControllersImpl) Image(ctx *gin.Context) {
 
 	result, err := h.services.Create(ctx, fileData)
 	if err != nil {
-		if err != nil {
-			ctx.JSON(err.Status, err)
-			return
-		}
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "File upload process completed",
+		Body:    result,
+	})
+}
+
+func (h *CompControllersImpl) General(ctx *gin.Context) {
+	form, exc := ctx.MultipartForm()
+	if exc != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	files := form.File["file"]
+	if len(files) == 0 {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, "No files uploaded"))
+		return
+	}
+
+	if files[0].Size > (10 * 1024 * 1024) {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, "File size exceeds 10MB"))
+		return
+	}
+
+	fileContent, exc := files[0].Open()
+	if exc != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, "Error reading file"))
+		return
+	}
+	defer fileContent.Close()
+
+	buffer := make([]byte, files[0].Size)
+	_, exc = fileContent.Read(buffer)
+	if exc != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, "Error reading file"))
+		return
+	}
+
+	fileName := files[0].Filename
+	fileExtension := fileName[strings.LastIndex(fileName, ".")+1:]
+	mimeType := files[0].Header.Get("Content-Type")
+	mimeParts := strings.Split(mimeType, "/")
+	mimeMainType, mimeSubType := mimeParts[0], ""
+	if len(mimeParts) > 1 {
+		mimeSubType = mimeParts[1]
+	}
+
+	fileData := dto.FilesInput{
+		OriginalFileName: fileName,
+		FileBuffer:       buffer,
+		Size:             helpers.FormatFileSize(files[0].Size),
+		Extension:        fileExtension,
+		MimeType:         mimeMainType,
+		MimeSubType:      mimeSubType,
+		Meta:             "{}",
+	}
+
+	result, err := h.services.Create(ctx, fileData)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
 	}
 
 	ctx.JSON(http.StatusOK, dto.Response{

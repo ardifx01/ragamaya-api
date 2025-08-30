@@ -9,4 +9,5 @@ type CompControllers interface {
 	Delete(ctx *gin.Context)
 	Search(ctx *gin.Context)
 	DeleteThumbnail(ctx *gin.Context)
+	FindProductDigitalOwned(ctx *gin.Context)
 }

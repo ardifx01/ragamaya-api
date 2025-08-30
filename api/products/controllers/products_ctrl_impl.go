@@ -136,3 +136,18 @@ func (h *CompControllersImpl) DeleteThumbnail(ctx *gin.Context) {
 		Message: "thumbnail deleted successfully",
 	})
 }
+
+func (h *CompControllersImpl) FindProductDigitalOwned(ctx *gin.Context) {
+	products, err := h.services.FindProductDigitalOwned(ctx)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    products,
+		Size:    len(products),
+	})
+}

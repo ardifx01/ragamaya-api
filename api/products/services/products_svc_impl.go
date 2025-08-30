@@ -170,4 +170,21 @@ func (s *CompServicesImpl) DeleteThumbnail(ctx *gin.Context, productUUID string,
 	return nil
 }
 
-// func (s *CompServicesImpl) FindProductDigitalOwned(ctx *gin.Context, tx *gorm.DB, userUUID string) ([]models.Products, *exceptions.Exception)
+func (s *CompServicesImpl) FindProductDigitalOwned(ctx *gin.Context) ([]dto.ProductRes, *exceptions.Exception) {
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	products, exc := s.repo.FindProductDigitalOwned(ctx, s.DB, userData.UUID)
+	if exc != nil {
+		return nil, exc
+	}
+
+	var output []dto.ProductRes
+	for _, item := range products {
+		output = append(output, mapper.MapProductMTO(item))
+	}
+
+	return output, nil
+}

@@ -14,4 +14,5 @@ type CompServices interface {
 	Delete(ctx *gin.Context, uuid string) *exceptions.Exception
 	Search(ctx *gin.Context, data dto.ProductSearchReq) ([]dto.ProductRes, *exceptions.Exception)
 	DeleteThumbnail(ctx *gin.Context, productUUID string, id uint) *exceptions.Exception
+	FindProductDigitalOwned(ctx *gin.Context) ([]dto.ProductRes, *exceptions.Exception)
 }

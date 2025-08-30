@@ -54,6 +54,28 @@ func (h *CompControllersImpl) FindByUUID(ctx *gin.Context) {
 	})
 }
 
+func (h *CompControllersImpl) Update(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+
+	var data dto.ProductUpdateReq
+	jsonErr := ctx.ShouldBindJSON(&data)
+	if jsonErr != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	err := h.services.Update(ctx, uuid, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "update success",
+	})
+}
+
 func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 	uuid := ctx.Param("uuid")
 	err := h.services.Delete(ctx, uuid)

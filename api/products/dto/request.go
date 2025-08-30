@@ -38,3 +38,12 @@ type ProductSearchReq struct {
 	PageSize    *int         `form:"page_size" validate:"omitempty,gte=1,lte=100"`
 	SellerUUID  *string      `form:"seller_uuid" validate:"omitempty,uuid4"`
 }
+
+type ProductUpdateReq struct {
+	Name        string              `json:"name" validate:"required"`
+	Description string              `json:"description" validate:"required"`
+	Price       uint                `json:"price" validate:"required"`
+	Stock       int                 `json:"stock" validate:"required"`
+	Keywords    string              `json:"keywords" validate:"required"`
+	Thumbnails  []ProductThumbnails `json:"thumbnails" validate:"required,dive"`
+}

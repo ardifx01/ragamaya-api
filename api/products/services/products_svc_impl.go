@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"ragamaya-api/api/products/dto"
 	"ragamaya-api/api/products/repositories"
+	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
@@ -44,6 +45,48 @@ func (s *CompServicesImpl) Register(ctx *gin.Context, data dto.RegisterReq) *exc
 	input.SellerUUID = sellerData.SellerProfile.UUID
 
 	result := s.repo.Create(ctx, s.DB, input)
+	if result != nil {
+		return result
+	}
+
+	return nil
+}
+
+func (s *CompServicesImpl) Update(ctx *gin.Context, uuid string, data dto.ProductUpdateReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	productData, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return err
+	}
+
+	sellerData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return err
+	}
+
+	if productData.SellerUUID != sellerData.SellerProfile.UUID {
+		return exceptions.NewException(http.StatusForbidden, exceptions.ErrNotTheOwner)
+	}
+
+	productData.Name = data.Name
+	productData.Description = data.Description
+	productData.Price = int64(data.Price)
+	productData.Stock = data.Stock
+	productData.Keywords = data.Keywords
+
+	productData.Thumbnails = nil
+	for _, thumbnail := range data.Thumbnails {
+		productData.Thumbnails = append(productData.Thumbnails, models.ProductThumbnails{
+			ProductUUID:  uuid,
+			ThumbnailURL: thumbnail.ThumbnailURL,
+		})
+	}
+
+	result := s.repo.Update(ctx, s.DB, *productData)
 	if result != nil {
 		return result
 	}

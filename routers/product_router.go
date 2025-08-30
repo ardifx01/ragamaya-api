@@ -13,6 +13,7 @@ func ProductRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 		productGroup.GET("/search", compControllers.Search)
 		productGroup.GET("/:uuid", compControllers.FindByUUID)
 		productGroup.POST("/register", middleware.SellerMiddleware(), compControllers.Register)
+		productGroup.PUT("/update/:uuid", middleware.SellerMiddleware(), compControllers.Update)
 		productGroup.DELETE("/delete/:uuid", middleware.SellerMiddleware(), compControllers.Delete)
 	}
 }

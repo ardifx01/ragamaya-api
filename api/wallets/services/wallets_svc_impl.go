@@ -274,6 +274,11 @@ func (s *CompServicesImpl) ResponsePayout(ctx *gin.Context, data dto.WalletPayou
 		}
 
 		go func() {
+			payoutData.TransactionReceipt = models.WalletPayoutTransactionReceipt{
+				PayoutUUID: payoutData.UUID,
+				ReceiptURL: data.ReceiptURL,
+				Note:       data.Note,
+			}
 			err = emails.PayoutNotificationEmail(payoutData.Wallet.User.Email, *payoutData)
 			if err != nil {
 				logger.Error("Failed to send payout notification email: %v", err)

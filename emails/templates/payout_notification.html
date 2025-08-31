@@ -76,28 +76,33 @@
         align-items: center;
         gap: 8px;
       }
+      .info-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
       .info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
         border-bottom: 1px solid rgba(108, 117, 125, 0.1);
       }
       .info-row:last-child {
         border-bottom: none;
       }
+      .info-row td {
+        padding: 12px 0;
+        vertical-align: top;
+      }
       .info-label {
         font-weight: 500;
         color: #495057;
         font-size: 15px;
+        width: 40%;
       }
       .info-value {
         font-weight: 600;
         color: #212529;
         text-align: right;
         font-size: 15px;
-        max-width: 60%;
-        word-break: break-word;
+        width: 60%;
+        word-wrap: break-word;
       }
       .amount-highlight {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -248,39 +253,38 @@
             Detail Payout
           </div>
 
-          <div class="info-row">
-            <span class="info-label">ID Payout</span>
-            <span class="info-value">{{.UUID}}</span>
-          </div>
+          <table class="info-table">
+            <tr class="info-row">
+              <td class="info-label">Ref</td>
+              <td class="info-value">{{.UUID}}</td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Jumlah Payout</span>
-            <span class="info-value amount-highlight"
-              >Rp {{printf "%s" (.Amount | printf "%.0f" | printf "%.2f" |
-              printf "%s")}}</span
-            >
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Jumlah Payout</td>
+              <td class="info-value amount-highlight">Rp {{.Amount}}</td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Status</span>
-            <span class="info-value" style="color: #28a745; font-weight: 700"
-              >{{.Status}}</span
-            >
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Status</td>
+              <td class="info-value" style="color: #28a745; font-weight: 700">
+                {{.Status}}
+              </td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Tanggal Permintaan</span>
-            <span class="info-value"
-              >{{.CreatedAt.Format "2 January 2006, 15:04"}}</span
-            >
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Tanggal Permintaan</td>
+              <td class="info-value">
+                {{.CreatedAt.Format "2 January 2006, 15:04"}}
+              </td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Tanggal Diproses</span>
-            <span class="info-value"
-              >{{.UpdatedAt.Format "2 January 2006, 15:04"}}</span
-            >
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Tanggal Diproses</td>
+              <td class="info-value">
+                {{.UpdatedAt.Format "2 January 2006, 15:04"}}
+              </td>
+            </tr>
+          </table>
         </div>
 
         <!-- Bank Details -->
@@ -290,23 +294,24 @@
             Detail Rekening Tujuan
           </div>
 
-          <div class="info-row">
-            <span class="info-label">Bank</span>
-            <span class="info-value">{{.BankName}}</span>
-          </div>
+          <table class="info-table">
+            <tr class="info-row">
+              <td class="info-label">Bank</td>
+              <td class="info-value">{{.BankName}}</td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Nomor Rekening</span>
-            <span class="info-value">{{.BankAccount}}</span>
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Nomor Rekening</td>
+              <td class="info-value">{{.BankAccount}}</td>
+            </tr>
 
-          <div class="info-row">
-            <span class="info-label">Nama Pemilik Rekening</span>
-            <span class="info-value">{{.BankAccountName}}</span>
-          </div>
+            <tr class="info-row">
+              <td class="info-label">Nama Pemilik Rekening</td>
+              <td class="info-value">{{.BankAccountName}}</td>
+            </tr>
+          </table>
         </div>
 
-        {{if .TransactionReceipt.ReceiptURL}}
         <!-- Transaction Receipt -->
         <div class="receipt-section">
           <h3 style="color: #28a745; margin: 0 0 15px 0; font-size: 16px">
@@ -322,7 +327,6 @@
           >
             📥 Download Bukti Transfer
           </a>
-          {{if .TransactionReceipt.Note}}
           <p
             style="
               margin: 15px 0 0 0;
@@ -333,9 +337,7 @@
           >
             Catatan: {{.TransactionReceipt.Note}}
           </p>
-          {{end}}
         </div>
-        {{end}}
 
         <div class="dashboard-button">
           <a href="#" target="_blank"> 💼 Lihat Riwayat Payout </a>

@@ -8,6 +8,7 @@ import (
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
+	"ragamaya-api/pkg/logger"
 	"strconv"
 
 	"gopkg.in/gomail.v2"
@@ -60,6 +61,8 @@ func ExampleEmail(data dto.EmailExample) *exceptions.Exception {
 	if err != nil {
 		return err
 	}
+
+	logger.Info("Email sent successfully to %s", data.Email)
 
 	return nil
 }

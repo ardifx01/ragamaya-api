@@ -31,6 +31,8 @@ func main() {
 		&models.WalletTransactionHistory{},
 		&models.WalletPayoutRequest{},
 		&models.WalletPayoutTransactionReceipt{},
+		&models.ArticleCategory{},
+		&models.Article{},
 	)
 	if err != nil {
 		panic("failed to migrate models: " + err.Error())

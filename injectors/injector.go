@@ -34,6 +34,10 @@ import (
 	walletRepositories "ragamaya-api/api/wallets/repositories"
 	walletServices "ragamaya-api/api/wallets/services"
 	
+	articleControllers "ragamaya-api/api/articles/controllers"
+	articleRepositories "ragamaya-api/api/articles/repositories"
+	articleServices "ragamaya-api/api/articles/services"
+	
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
@@ -90,6 +94,12 @@ var walletFeatureSet = wire.NewSet(
 	walletControllers.NewCompController,
 )
 
+var articleFeatureSet = wire.NewSet(
+	articleRepositories.NewComponentRepository,
+	articleServices.NewComponentServices,
+	articleControllers.NewCompController,
+)
+
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
 	wire.Build(userFeatureSet)
 	return nil
@@ -122,5 +132,10 @@ func InitializePaymentController(db *gorm.DB, validate *validator.Validate) paym
 
 func InitializeWalletController(db *gorm.DB, validate *validator.Validate) walletControllers.CompControllers {
 	wire.Build(walletFeatureSet)
+	return nil
+}
+
+func InitializeArticleController(db *gorm.DB, validate *validator.Validate) articleControllers.CompControllers {
+	wire.Build(articleFeatureSet)
 	return nil
 }

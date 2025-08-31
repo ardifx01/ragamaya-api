@@ -31,6 +31,7 @@ func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *
 	orderController := injectors.InitializeOrderController(db, validate, midtransCore)
 	paymentController := injectors.InitializePaymentController(db, validate)
 	walletController := injectors.InitializeWalletController(db, validate)
+	articleController := injectors.InitializeArticleController(db, validate)
 
 	UserRoutes(r, userController)
 	StorageRoutes(r, storageController)
@@ -39,4 +40,5 @@ func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *
 	OrderRoutes(r, orderController)
 	PaymentRoutes(r, paymentController)
 	WalletRoutes(r, walletController)
+	ArticleRoutes(r, articleController)
 }

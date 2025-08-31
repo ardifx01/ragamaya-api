@@ -12,6 +12,9 @@ import (
 	"github.com/google/wire"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
+	controllers8 "ragamaya-api/api/articles/controllers"
+	repositories8 "ragamaya-api/api/articles/repositories"
+	services8 "ragamaya-api/api/articles/services"
 	controllers5 "ragamaya-api/api/orders/controllers"
 	repositories6 "ragamaya-api/api/orders/repositories"
 	services5 "ragamaya-api/api/orders/services"
@@ -90,6 +93,13 @@ func InitializeWalletController(db *gorm.DB, validate *validator.Validate) contr
 	return compControllers
 }
 
+func InitializeArticleController(db *gorm.DB, validate *validator.Validate) controllers8.CompControllers {
+	compRepositories := repositories8.NewComponentRepository()
+	compServices := services8.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers8.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
 var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController, repositories2.NewComponentRepository)
@@ -105,3 +115,5 @@ var orderFeatureSet = wire.NewSet(repositories6.NewComponentRepository, services
 var paymentFeatureSet = wire.NewSet(repositories7.NewComponentRepository, services6.NewComponentServices, controllers6.NewCompController)
 
 var walletFeatureSet = wire.NewSet(repositories2.NewComponentRepository, services7.NewComponentServices, controllers7.NewCompController)
+
+var articleFeatureSet = wire.NewSet(repositories8.NewComponentRepository, services8.NewComponentServices, controllers8.NewCompController)

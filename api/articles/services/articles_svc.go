@@ -9,4 +9,5 @@ import (
 
 type CompServices interface {
 	FindAllCategories(ctx *gin.Context) ([]dto.CategoryRes, *exceptions.Exception)
+	Create(ctx *gin.Context, data dto.ArticleReq) (*dto.ArticleRes, *exceptions.Exception)
 }

@@ -15,6 +15,10 @@ func InternalRouters(r *gin.RouterGroup, db *gorm.DB, validate *validator.Valida
 	AuthRoutes(r, internalController)
 
 	r.Use(middleware.InternalMiddleware())
+
 	walletController := injectors.InitializeWalletController(db, validate)
+	articleController := injectors.InitializeArticleController(db, validate)
+
 	WalletRouter(r, walletController)
+	ArticleRoutes(r, articleController)
 }

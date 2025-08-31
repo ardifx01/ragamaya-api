@@ -1,13 +1,17 @@
 package services
 
 import (
+	"net/http"
 	"ragamaya-api/api/articles/dto"
 	"ragamaya-api/api/articles/repositories"
+	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
+	"ragamaya-api/pkg/helpers"
 	"ragamaya-api/pkg/mapper"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -38,4 +42,48 @@ func (s *CompServicesImpl) FindAllCategories(ctx *gin.Context) ([]dto.CategoryRe
 	}
 
 	return result, nil
+}
+
+func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.ArticleReq) (*dto.ArticleRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	existCategory, err := s.repo.FindCategoryByName(ctx, tx, data.Category)
+	if err != nil {
+		if err.Status == http.StatusNotFound && existCategory == nil {
+			existCategory = &models.ArticleCategory{
+				UUID:     uuid.NewString(),
+				Name:     data.Category,
+			}
+			err = s.repo.CreateCategory(ctx, tx, *existCategory)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+
+	input := mapper.MapArticleITM(data)
+	input.UUID = uuid.NewString()
+	input.Slug = helpers.SlugifyUnique(data.Title)
+	input.CategoryUUID = existCategory.UUID
+
+	err = s.repo.Create(ctx, tx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := s.repo.FindByUUID(ctx, tx, input.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapArticleMTO(*result)
+	return &output, nil
 }

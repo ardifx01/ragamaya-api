@@ -40,3 +40,33 @@ func (r *CompRepositoriesImpl) FindAllCategories(ctx *gin.Context, tx *gorm.DB) 
 	}
 	return categories, nil
 }
+
+func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, article models.Article) *exceptions.Exception {
+	result := tx.Create(&article)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+	return nil
+}
+
+func (r *CompRepositoriesImpl) FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Article, *exceptions.Exception) {
+	var article models.Article
+	err := tx.Where("slug = ?", slug).
+		Preload("Category").
+		First(&article).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &article, nil
+}
+
+func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Article, *exceptions.Exception) {
+	var article models.Article
+	err := tx.Where("uuid = ?", uuid).
+		Preload("Category").
+		First(&article).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &article, nil
+}

@@ -12,4 +12,7 @@ type CompRepositories interface {
 	CreateCategory(ctx *gin.Context, tx *gorm.DB, category models.ArticleCategory) *exceptions.Exception
 	FindCategoryByName(ctx *gin.Context, tx *gorm.DB, name string) (*models.ArticleCategory, *exceptions.Exception)
 	FindAllCategories(ctx *gin.Context, tx *gorm.DB) ([]models.ArticleCategory, *exceptions.Exception)
+	Create(ctx *gin.Context, tx *gorm.DB, article models.Article) *exceptions.Exception
+	FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Article, *exceptions.Exception)
+	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Article, *exceptions.Exception)
 }

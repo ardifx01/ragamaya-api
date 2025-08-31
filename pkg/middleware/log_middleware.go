@@ -1,12 +1,8 @@
 package middleware
 
 import (
-	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -53,39 +49,13 @@ func RequestResponseLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
-		var reqBody []byte
-
-		contentType := c.GetHeader("Content-Type")
-		if c.Request.Body != nil && !strings.HasPrefix(contentType, "multipart/") {
-			bodyBytes, _ := ioutil.ReadAll(io.LimitReader(c.Request.Body, 1024))
-			reqBody = bodyBytes
-			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		}
-
 		c.Next()
 
 		duration := time.Since(start)
 		status := c.Writer.Status()
 
-		log.Printf("[REQ] %s %s | Body: %s", colorMethod(c.Request.Method), c.Request.URL.Path, truncateForLog(reqBody))
+		log.Printf("[REQ] %s %s", colorMethod(c.Request.Method), c.Request.URL.Path)
 		log.Printf("[RES] %s %s | Status: %s | Duration: %v",
 			colorMethod(c.Request.Method), c.Request.URL.Path, colorStatus(status), duration)
 	}
-}
-
-type bodyLogWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
-
-func (w *bodyLogWriter) Write(b []byte) (int, error) {
-	w.body.Write(b)
-	return w.ResponseWriter.Write(b)
-}
-
-func truncateForLog(b []byte) string {
-	if len(b) > 1024 {
-		return string(b[:1024]) + "..."
-	}
-	return string(b)
 }

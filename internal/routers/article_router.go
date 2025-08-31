@@ -10,6 +10,7 @@ func ArticleRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 	articleGroup := r.Group("/article")
 	{
 		articleGroup.GET("/categories", compControllers.FindAllCategories)
+		articleGroup.GET("/search", compControllers.Search)
 		articleGroup.POST("/create", compControllers.Create)
 	}
 }

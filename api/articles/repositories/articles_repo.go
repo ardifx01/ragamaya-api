@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"ragamaya-api/api/articles/dto"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 
@@ -15,4 +16,5 @@ type CompRepositories interface {
 	Create(ctx *gin.Context, tx *gorm.DB, article models.Article) *exceptions.Exception
 	FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Article, *exceptions.Exception)
 	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Article, *exceptions.Exception)
+	Search(ctx *gin.Context, tx *gorm.DB, data dto.SearchReq) ([]models.Article, *exceptions.Exception)
 }

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+	"ragamaya-api/api/articles/dto"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 
@@ -69,4 +71,33 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 		return nil, exceptions.ParseGormError(tx, err)
 	}
 	return &article, nil
+}
+
+func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, data dto.SearchReq) ([]models.Article, *exceptions.Exception) {
+	var articles []models.Article
+
+	query := tx.WithContext(ctx).
+		Model(&models.Article{}).
+		Preload("Category")
+
+	if data.Keyword != nil && *data.Keyword != "" {
+		kw := fmt.Sprintf("%%%s%%", *data.Keyword)
+		query = query.Where(
+			tx.Where("title ILIKE ?", kw).
+				Or("content ILIKE ?", kw),
+		)
+	}
+
+	if data.Category != nil && *data.Category != "" {
+		query = query.Joins("JOIN article_categories ON articles.category_uuid = article_categories.uuid").
+			Where("LOWER(article_categories.name) = LOWER(?)", *data.Category)
+	}
+
+	err := query.
+		Order("created_at DESC").
+		Find(&articles).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return articles, nil
 }

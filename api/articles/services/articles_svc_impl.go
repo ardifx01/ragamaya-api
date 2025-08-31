@@ -57,8 +57,8 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.ArticleReq) (*dto.A
 	if err != nil {
 		if err.Status == http.StatusNotFound && existCategory == nil {
 			existCategory = &models.ArticleCategory{
-				UUID:     uuid.NewString(),
-				Name:     data.Category,
+				UUID: uuid.NewString(),
+				Name: data.Category,
 			}
 			err = s.repo.CreateCategory(ctx, tx, *existCategory)
 			if err != nil {
@@ -86,4 +86,24 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.ArticleReq) (*dto.A
 
 	output := mapper.MapArticleMTO(*result)
 	return &output, nil
+}
+
+func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.ArticleRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	result, err := s.repo.Search(ctx, s.DB, data)
+	if err != nil {
+		return nil, err
+	}
+
+	var output []dto.ArticleRes
+
+	for _, item := range result {
+		output = append(output, mapper.MapArticleMTO(item))
+	}
+
+	return output, nil
 }

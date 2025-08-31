@@ -6,3 +6,8 @@ type ArticleReq struct {
 	Content   string `json:"content" validate:"required"`
 	Category  string `json:"category" validate:"required"`
 }
+
+type SearchReq struct {
+	Keyword  *string `form:"keyword" validate:"omitempty"`
+	Category *string `form:"category" validate:"omitempty"`
+}

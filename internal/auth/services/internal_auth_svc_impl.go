@@ -37,7 +37,7 @@ func (s *CompServicesImpl) Login(ctx *gin.Context, data dto.Login) (*string, *ex
 		return nil, exceptions.NewException(http.StatusUnauthorized, exceptions.ErrInvalidCredentials)
 	}
 
-	JWT_SECRET := config.GetJWTSecret()
+	JWT_SECRET := config.GetInternalSecret()
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 

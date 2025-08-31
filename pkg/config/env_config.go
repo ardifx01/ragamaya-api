@@ -14,6 +14,7 @@ type Config struct {
 	DB_NAME             string
 	PORT                string
 	JWT_SECRET          string
+	INTERNAL_SECRET     string
 	ENVIRONMENT         string
 	ADMIN_USERNAME      string
 	ADMIN_PASSWORD      string
@@ -44,6 +45,7 @@ func InitConfig() {
 		DB_NAME:             getEnv("DB_NAME"),
 		PORT:                getEnv("PORT"),
 		JWT_SECRET:          getEnv("JWT_SECRET"),
+		INTERNAL_SECRET:     getEnv("INTERNAL_SECRET"),
 		ENVIRONMENT:         getEnv("ENVIRONMENT"),
 		ADMIN_USERNAME:      getEnv("ADMIN_USERNAME"),
 		ADMIN_PASSWORD:      getEnv("ADMIN_PASSWORD"),
@@ -65,7 +67,6 @@ func InitConfig() {
 
 	globalConfig = config
 	logger.Info("Configuration initialized successfully")
-	return
 }
 
 func GetConfig() *Config {
@@ -82,6 +83,7 @@ func GetDBPort() string            { return GetConfig().DB_PORT }
 func GetDBName() string            { return GetConfig().DB_NAME }
 func GetPort() string              { return GetConfig().PORT }
 func GetJWTSecret() string         { return GetConfig().JWT_SECRET }
+func GetInternalSecret() string    { return GetConfig().INTERNAL_SECRET }
 func GetEnvironment() string       { return GetConfig().ENVIRONMENT }
 func GetAdminUsername() string     { return GetConfig().ADMIN_USERNAME }
 func GetAdminPassword() string     { return GetConfig().ADMIN_PASSWORD }

@@ -51,7 +51,7 @@ func main() {
 	r.Use(middleware.RateLimitMiddleware(lmt))
 
 	internal := r.Group("/internal")
-	internalRouters.InternalRouters(internal, db, validate)
+	internalRouters.InternalRouters(internal, db, storage, validate)
 
 	midtrans := r.Group("/midtrans")
 	midtransRouters.MidtransRouters(midtrans, db, validate, midtransCore)

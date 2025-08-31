@@ -12,7 +12,7 @@ import (
 
 func InternalMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		JWT_SECRET := config.GetJWTSecret()
+		JWT_SECRET := config.GetInternalSecret()
 		ADMIN_USERNAME := config.GetAdminUsername()
 
 		var secretKey = []byte(JWT_SECRET)

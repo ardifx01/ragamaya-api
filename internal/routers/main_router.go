@@ -5,12 +5,13 @@ import (
 	internalInjectors "ragamaya-api/internal/injectors"
 	"ragamaya-api/pkg/middleware"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
-func InternalRouters(r *gin.RouterGroup, db *gorm.DB, validate *validator.Validate) {
+func InternalRouters(r *gin.RouterGroup, db *gorm.DB, s3client *s3.Client, validate *validator.Validate) {
 	internalController := internalInjectors.InitializeAuthController(validate)
 	AuthRoutes(r, internalController)
 
@@ -18,7 +19,9 @@ func InternalRouters(r *gin.RouterGroup, db *gorm.DB, validate *validator.Valida
 
 	walletController := injectors.InitializeWalletController(db, validate)
 	articleController := injectors.InitializeArticleController(db, validate)
+	storageController := injectors.InitializeStorageController(db, s3client, validate)
 
 	WalletRouter(r, walletController)
 	ArticleRoutes(r, articleController)
+	StorageRoutes(r, storageController)
 }

@@ -101,3 +101,11 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, data dto.Se
 	}
 	return articles, nil
 }
+
+func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
+	err := tx.Where("uuid = ?", uuid).Delete(&models.Article{}).Error
+	if err != nil {
+		return exceptions.ParseGormError(tx, err)
+	}
+	return nil
+}

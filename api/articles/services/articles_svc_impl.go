@@ -107,3 +107,7 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.A
 
 	return output, nil
 }
+
+func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
+	return s.repo.Delete(ctx, s.DB, uuid)
+}

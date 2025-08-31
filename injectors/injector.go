@@ -38,6 +38,10 @@ import (
 	articleRepositories "ragamaya-api/api/articles/repositories"
 	articleServices "ragamaya-api/api/articles/services"
 	
+	quizControllers "ragamaya-api/api/quizzes/controllers"
+	quizRepositories "ragamaya-api/api/quizzes/repositories"
+	quizServices "ragamaya-api/api/quizzes/services"
+	
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
@@ -100,6 +104,12 @@ var articleFeatureSet = wire.NewSet(
 	articleControllers.NewCompController,
 )
 
+var quizFeatureSet = wire.NewSet(
+	quizRepositories.NewComponentRepository,
+	quizServices.NewComponentServices,
+	quizControllers.NewCompController,
+)
+
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
 	wire.Build(userFeatureSet)
 	return nil
@@ -137,5 +147,10 @@ func InitializeWalletController(db *gorm.DB, validate *validator.Validate) walle
 
 func InitializeArticleController(db *gorm.DB, validate *validator.Validate) articleControllers.CompControllers {
 	wire.Build(articleFeatureSet)
+	return nil
+}
+
+func InitializeQuizController(db *gorm.DB, validate *validator.Validate) quizControllers.CompControllers {
+	wire.Build(quizFeatureSet)
 	return nil
 }

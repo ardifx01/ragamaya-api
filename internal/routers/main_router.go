@@ -20,8 +20,10 @@ func InternalRouters(r *gin.RouterGroup, db *gorm.DB, s3client *s3.Client, valid
 	walletController := injectors.InitializeWalletController(db, validate)
 	articleController := injectors.InitializeArticleController(db, validate)
 	storageController := injectors.InitializeStorageController(db, s3client, validate)
+	quizController := injectors.InitializeQuizController(db, validate)
 
 	WalletRouter(r, walletController)
 	ArticleRoutes(r, articleController)
 	StorageRoutes(r, storageController)
+	QuizRoutes(r, quizController)
 }

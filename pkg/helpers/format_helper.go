@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"ragamaya-api/pkg/exceptions"
 	"time"
@@ -30,4 +31,12 @@ func FormatIndonesianLocaleString(value uint) string {
 
 func FormatMidtransErrorToException(err *midtrans.Error) *exceptions.Exception {
 	return exceptions.NewException(err.StatusCode, err.Message)
+}
+
+func FormatToJSON(data interface{}) string {
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		return ""
+	}
+	return string(jsonBytes)
 }

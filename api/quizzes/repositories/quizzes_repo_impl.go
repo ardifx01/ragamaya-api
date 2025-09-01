@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+	"ragamaya-api/api/quizzes/dto"
 	"ragamaya-api/models"
 	"ragamaya-api/pkg/exceptions"
 
@@ -48,4 +50,36 @@ func (r *CompRepositoriesImpl) Create(ctx *gin.Context, tx *gorm.DB, data models
 	}
 
 	return nil
+}
+
+func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, data dto.SearchReq) ([]models.Quiz, *exceptions.Exception) {
+	var quizzes []models.Quiz
+
+	query := tx.WithContext(ctx).
+		Model(&models.Quiz{}).
+		Preload("Category")
+
+	if data.Keyword != nil && *data.Keyword != "" {
+		kw := fmt.Sprintf("%%%s%%", *data.Keyword)
+		query = query.Where(
+			tx.Where("title ILIKE ?", kw),
+		)
+	}
+
+	if data.Category != nil && *data.Category != "" {
+		query = query.Joins("JOIN quiz_categories ON quizzes.category_uuid = quiz_categories.uuid").
+			Where("LOWER(quiz_categories.name) = LOWER(?)", *data.Category)
+	}
+
+	if data.Level != nil {
+		query = query.Where("level = ?", *data.Level)
+	}
+
+	err := query.
+		Order("created_at DESC").
+		Find(&quizzes).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return quizzes, nil
 }

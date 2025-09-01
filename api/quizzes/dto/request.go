@@ -23,3 +23,9 @@ type QuizQuestionReq struct {
 	Options     []string `json:"options" validate:"required"`
 	AnswerIndex int      `json:"answer_index" validate:"number,gte=0"`
 }
+
+type SearchReq struct {
+	Keyword  *string    `form:"keyword" validate:"omitempty"`
+	Level    *QuizLevel `form:"level" validate:"omitempty,oneof=beginner intermediate advanced"`
+	Category *string    `form:"category" validate:"omitempty"`
+}

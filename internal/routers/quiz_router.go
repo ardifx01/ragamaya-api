@@ -10,6 +10,7 @@ func QuizRoutes(r *gin.RouterGroup, compControllers controllers.CompControllers)
 	quizGroup := r.Group("/quiz")
 	{
 		quizGroup.GET("/categories", compControllers.FindAllCategories)
+		quizGroup.GET("/search", compControllers.Search)
 		quizGroup.POST("/create", compControllers.Create)
 	}
 }

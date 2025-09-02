@@ -35,6 +35,7 @@ func main() {
 		&models.Article{},
 		&models.QuizCategory{},
 		&models.Quiz{},
+		&models.QuizCertificate{},
 	)
 	if err != nil {
 		panic("failed to migrate models: " + err.Error())

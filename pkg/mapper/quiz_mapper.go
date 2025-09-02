@@ -38,3 +38,10 @@ func MapQuizMTDO(model models.Quiz) dto.QuizDetailRes {
 	output.TotalQuestions = len(questions)
 	return output
 }
+
+func MapCertificateMTO(model models.QuizCertificate) dto.CertificateRes {
+	var output dto.CertificateRes
+	mapstructure.Decode(model, &output)
+	output.CreatedAt = model.CreatedAt
+	return output
+}

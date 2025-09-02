@@ -48,5 +48,26 @@ type Quiz struct {
 	UpdatedAt time.Time  `gorm:"not null"`
 	DeletedAt *time.Time `gorm:"index"`
 
+	Certificates []QuizCertificate `gorm:"foreignKey:QuizUUID;references:UUID"`
+
 	Category *QuizCategory `gorm:"foreignKey:CategoryUUID;references:UUID"`
+}
+
+type QuizCertificate struct {
+	gorm.Model
+
+	ID       uint   `gorm:"primaryKey"`
+	UUID     string `gorm:"not null;unique;index"`
+	QuizUUID string `gorm:"not null;index"`
+	UserUUID string `gorm:"not null;index"`
+
+	Score          float32 `gorm:"not null"`
+	CertificateURL string  `gorm:"not null"`
+
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
+	DeletedAt *time.Time `gorm:"index"`
+
+	Quiz *Quiz  `gorm:"foreignKey:QuizUUID;references:UUID"`
+	User *Users `gorm:"foreignKey:UserUUID;references:UUID"`
 }

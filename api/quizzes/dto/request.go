@@ -34,3 +34,12 @@ type SearchReq struct {
 type AnalyzeReq struct {
 	Answers []int `json:"answers" validate:"required"`
 }
+
+type CertificateReq struct {
+	UUID     string
+	UserName string
+	QuizName string
+	Date     string
+	Score    float32
+	QRData   string
+}

@@ -29,6 +29,7 @@ type Users struct {
 	UpdatedAt time.Time  `gorm:"not null"`
 	DeletedAt *time.Time `gorm:"index"`
 
-	SellerProfile Sellers `gorm:"foreignKey:UserUUID;references:UUID"`
-	Wallet        Wallet  `gorm:"foreignKey:UserUUID;references:UUID"`
+	SellerProfile Sellers           `gorm:"foreignKey:UserUUID;references:UUID"`
+	Wallet        Wallet            `gorm:"foreignKey:UserUUID;references:UUID"`
+	Certificates  []QuizCertificate `gorm:"foreignKey:UserUUID;references:UUID"`
 }

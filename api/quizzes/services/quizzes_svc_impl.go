@@ -1,32 +1,49 @@
 package services
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"html/template"
 	"net/http"
+	"os"
 	"ragamaya-api/api/quizzes/dto"
 	"ragamaya-api/api/quizzes/repositories"
 	"ragamaya-api/models"
+	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
+	"ragamaya-api/pkg/logger"
 	"ragamaya-api/pkg/mapper"
+	"time"
+
+	storageDTO "ragamaya-api/api/storages/dto"
+	storageService "ragamaya-api/api/storages/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"github.com/chromedp/cdproto/page"
+	"github.com/chromedp/chromedp"
 )
 
 type CompServicesImpl struct {
 	repo     repositories.CompRepositories
 	DB       *gorm.DB
 	validate *validator.Validate
+
+	storageService storageService.CompServices
 }
 
-func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate) CompServices {
+func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate, storageService storageService.CompServices) CompServices {
 	return &CompServicesImpl{
 		repo:     compRepositories,
 		DB:       db,
 		validate: validate,
+
+		storageService: storageService,
 	}
 }
 
@@ -114,13 +131,32 @@ func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizD
 	return &output, nil
 }
 
-func (s *CompServicesImpl) Analyze(ctx *gin.Context, uuid string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception) {
+func (s *CompServicesImpl) Analyze(ctx *gin.Context, quizUUID string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception) {
 	validateErr := s.validate.Struct(data)
 	if validateErr != nil {
 		return nil, exceptions.NewValidationException(validateErr)
 	}
 
-	quizData, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	userData, err := helpers.GetUserData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	existCertificate, err := s.repo.FindCertificateByQuizUUIDandUserUUID(ctx, tx, quizUUID, userData.UUID)
+	if err != nil {
+		if err.Status != http.StatusNotFound {
+			return nil, err
+		}
+	}
+
+	if existCertificate != nil {
+		return nil, exceptions.NewValidationException(fmt.Errorf("quiz already completed"))
+	}
+
+	quizData, err := s.repo.FindByUUID(ctx, tx, quizUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -145,5 +181,116 @@ func (s *CompServicesImpl) Analyze(ctx *gin.Context, uuid string, data dto.Analy
 		result.Status = dto.Success
 	}
 
+	if result.Status == dto.Success {
+		certificateData := &models.QuizCertificate{
+			UUID:     uuid.NewString(),
+			QuizUUID: quizUUID,
+			UserUUID: userData.UUID,
+			Score:    result.Score,
+		}
+
+		certificate, err := s.GenerateCertificate(dto.CertificateReq{
+			UUID:     certificateData.UUID,
+			UserName: userData.Name,
+			QuizName: quiz.Title,
+			Date:     time.Now().Format("2006-01-02"),
+			Score:    result.Score,
+			QRData:   config.GetFrontendBaseURL(),
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		uploadData, err := s.storageService.Create(ctx, storageDTO.FilesInput{
+			OriginalFileName: `quiz-certificate-` + certificateData.UUID + `.pdf`,
+			FileBuffer:       *certificate,
+			Size:             helpers.FormatFileSize(int64(len(*certificate))),
+			Extension:        `pdf`,
+			MimeType:         `application/pdf`,
+			MimeSubType:      `pdf`,
+			Meta:             `{}`,
+		})
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		certificateData.CertificateURL = uploadData.PublicURL
+		err = s.repo.CreateCertificate(ctx, tx, *certificateData)
+		if err != nil {
+			return nil, err
+		}
+
+		certificateData, err = s.repo.FindCertificateByUUID(ctx, tx, certificateData.UUID)
+		if err != nil {
+			return nil, err
+		}
+
+		resultCertificate := mapper.MapCertificateMTO(*certificateData)
+		result.Certificate = &resultCertificate
+	}
+
 	return &result, nil
+}
+
+func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte, *exceptions.Exception) {
+	tmpl, err := template.ParseFiles(`static/templates/quiz_certificate.html`)
+	if err != nil {
+		return nil, exceptions.NewException(500, fmt.Sprintf("template parse error: %s", err))
+	}
+
+	var bufHTML bytes.Buffer
+	if err := tmpl.Execute(&bufHTML, data); err != nil {
+		logger.Error("template execute error: %v", err)
+		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
+	}
+
+	tempFile, err := os.CreateTemp("", "cert_*.html")
+	if err != nil {
+		logger.Error("generate certificate error: %v", err)
+		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
+	}
+	defer os.Remove(tempFile.Name())
+
+	if _, err := tempFile.Write(bufHTML.Bytes()); err != nil {
+		logger.Error("generate certificate error: %v", err)
+		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
+	}
+	tempFile.Close()
+
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	var pdfBuf []byte
+	err = chromedp.Run(ctx, chromedp.Tasks{
+		chromedp.Navigate("file://" + tempFile.Name()),
+		chromedp.WaitReady("body"),
+		chromedp.Sleep(500 * time.Millisecond),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			var err error
+			pdfBuf, _, err = page.PrintToPDF().
+				WithPrintBackground(true).
+				WithPaperWidth(11.7).
+				WithPaperHeight(8.3).
+				WithMarginTop(0).
+				WithMarginBottom(0).
+				WithMarginLeft(0).
+				WithMarginRight(0).
+				WithScale(1.0).
+				Do(ctx)
+			return err
+		}),
+	})
+
+	if err != nil {
+		logger.Error("generate certificate error: %v", err)
+		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
+	}
+
+	if len(pdfBuf) == 0 {
+		logger.Error("generate certificate error: %v", err)
+		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
+	}
+
+	return &pdfBuf, nil
 }

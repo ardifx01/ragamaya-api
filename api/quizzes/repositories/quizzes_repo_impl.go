@@ -105,3 +105,44 @@ func (r *CompRepositoriesImpl) FindBySlug(ctx *gin.Context, tx *gorm.DB, slug st
 	}
 	return &quiz, nil
 }
+
+func (r *CompRepositoriesImpl) CreateCertificate(ctx *gin.Context, tx *gorm.DB, data models.QuizCertificate) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+
+	return nil
+}
+
+func (r *CompRepositoriesImpl) FindCertificateByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.QuizCertificate, *exceptions.Exception) {
+	var certificate models.QuizCertificate
+	err := tx.Where("uuid = ?", uuid).
+		First(&certificate).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &certificate, nil
+}
+
+func (r *CompRepositoriesImpl) FindCertificateByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.QuizCertificate, *exceptions.Exception) {
+	var certificate []models.QuizCertificate
+	err := tx.Where("user_uuid = ?", uuid).
+		Find(&certificate).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return certificate, nil
+}
+
+func (r *CompRepositoriesImpl) FindCertificateByQuizUUIDandUserUUID(ctx *gin.Context, tx *gorm.DB, quizUUID string, userUUID string) (*models.QuizCertificate, *exceptions.Exception) {
+	var certificate models.QuizCertificate
+	err := tx.
+		Where("quiz_uuid = ?", quizUUID).
+		Where("user_uuid = ?", userUUID).
+		First(&certificate).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &certificate, nil
+}

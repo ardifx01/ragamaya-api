@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type Response struct {
 	Status  int         `json:"status"`
 	Message string      `json:"message"`
@@ -52,6 +54,15 @@ const (
 )
 
 type AnalyzeRes struct {
-	Score  float32            `json:"score"`
+	Score  float32       `json:"score"`
 	Status AnalyzeStatus `json:"match"`
+
+	Certificate *CertificateRes `json:"certificate,omitempty"`
+}
+
+type CertificateRes struct {
+	UUID           string    `json:"uuid"`
+	Score          float32   `json:"score"`
+	CertificateURL string    `json:"certificate_url"`
+	CreatedAt      time.Time `json:"created_at"`
 }

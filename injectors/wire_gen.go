@@ -106,10 +106,12 @@ func InitializeArticleController(db *gorm.DB, validate *validator.Validate) cont
 	return compControllers
 }
 
-func InitializeQuizController(db *gorm.DB, validate *validator.Validate) controllers9.CompControllers {
+func InitializeQuizController(db *gorm.DB, s3client *s3.Client, validate *validator.Validate) controllers9.CompControllers {
 	compRepositories := repositories9.NewComponentRepository()
-	compServices := services9.NewComponentServices(compRepositories, db, validate)
-	compControllers := controllers9.NewCompController(compServices)
+	repositoriesCompRepositories := repositories3.NewComponentRepository()
+	compServices := services2.NewComponentServices(repositoriesCompRepositories, db, s3client, validate)
+	servicesCompServices := services9.NewComponentServices(compRepositories, db, validate, compServices)
+	compControllers := controllers9.NewCompController(servicesCompServices)
 	return compControllers
 }
 
@@ -138,6 +140,6 @@ var walletFeatureSet = wire.NewSet(repositories2.NewComponentRepository, service
 
 var articleFeatureSet = wire.NewSet(repositories8.NewComponentRepository, services8.NewComponentServices, controllers8.NewCompController)
 
-var quizFeatureSet = wire.NewSet(repositories9.NewComponentRepository, services9.NewComponentServices, controllers9.NewCompController)
+var quizFeatureSet = wire.NewSet(repositories9.NewComponentRepository, services9.NewComponentServices, controllers9.NewCompController, repositories3.NewComponentRepository, services2.NewComponentServices)
 
 var predictFeatureSet = wire.NewSet(repositories10.NewComponentRepository, services10.NewComponentServices, controllers10.NewCompController)

@@ -32,7 +32,7 @@ func CompRouters(r *gin.RouterGroup, db *gorm.DB, storage *s3.Client, validate *
 	paymentController := injectors.InitializePaymentController(db, validate)
 	walletController := injectors.InitializeWalletController(db, validate)
 	articleController := injectors.InitializeArticleController(db, validate)
-	quizController := injectors.InitializeQuizController(db, validate)
+	quizController := injectors.InitializeQuizController(db, storage, validate)
 	predictController := injectors.InitializePredictController(db, validate)
 
 	UserRoutes(r, userController)

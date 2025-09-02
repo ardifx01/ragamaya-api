@@ -112,6 +112,9 @@ var quizFeatureSet = wire.NewSet(
 	quizRepositories.NewComponentRepository,
 	quizServices.NewComponentServices,
 	quizControllers.NewCompController,
+	
+	storageRepositories.NewComponentRepository,
+	storageServices.NewComponentServices,
 )
 
 var predictFeatureSet = wire.NewSet(
@@ -160,7 +163,7 @@ func InitializeArticleController(db *gorm.DB, validate *validator.Validate) arti
 	return nil
 }
 
-func InitializeQuizController(db *gorm.DB, validate *validator.Validate) quizControllers.CompControllers {
+func InitializeQuizController(db *gorm.DB, s3client *s3.Client,  validate *validator.Validate) quizControllers.CompControllers {
 	wire.Build(quizFeatureSet)
 	return nil
 }

@@ -21,6 +21,9 @@ import (
 	controllers6 "ragamaya-api/api/payments/controllers"
 	repositories7 "ragamaya-api/api/payments/repositories"
 	services6 "ragamaya-api/api/payments/services"
+	controllers10 "ragamaya-api/api/predicts/controllers"
+	repositories10 "ragamaya-api/api/predicts/repositories"
+	services10 "ragamaya-api/api/predicts/services"
 	controllers4 "ragamaya-api/api/products/controllers"
 	repositories5 "ragamaya-api/api/products/repositories"
 	services4 "ragamaya-api/api/products/services"
@@ -110,6 +113,13 @@ func InitializeQuizController(db *gorm.DB, validate *validator.Validate) control
 	return compControllers
 }
 
+func InitializePredictController(db *gorm.DB, validate *validator.Validate) controllers10.CompControllers {
+	compRepositories := repositories10.NewComponentRepository()
+	compServices := services10.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers10.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
 var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController, repositories2.NewComponentRepository)
@@ -129,3 +139,5 @@ var walletFeatureSet = wire.NewSet(repositories2.NewComponentRepository, service
 var articleFeatureSet = wire.NewSet(repositories8.NewComponentRepository, services8.NewComponentServices, controllers8.NewCompController)
 
 var quizFeatureSet = wire.NewSet(repositories9.NewComponentRepository, services9.NewComponentServices, controllers9.NewCompController)
+
+var predictFeatureSet = wire.NewSet(repositories10.NewComponentRepository, services10.NewComponentServices, controllers10.NewCompController)

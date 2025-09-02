@@ -32,6 +32,7 @@ type Config struct {
 	SMTP_PASSWORD       string
 	SMTP_SERVER         string
 	SMTP_PORT           string
+	MLSERVICE_BASE_URL  string
 }
 
 var globalConfig *Config
@@ -63,6 +64,7 @@ func InitConfig() {
 		SMTP_PASSWORD:       getEnv("SMTP_PASSWORD"),
 		SMTP_SERVER:         getEnv("SMTP_SERVER"),
 		SMTP_PORT:           getEnv("SMTP_PORT"),
+		MLSERVICE_BASE_URL:  getEnv("MLSERVICE_BASE_URL"),
 	}
 
 	globalConfig = config
@@ -101,6 +103,7 @@ func GetEmail() string             { return GetConfig().SMTP_EMAIL }
 func GetEmailPassword() string     { return GetConfig().SMTP_PASSWORD }
 func GetEmailServer() string       { return GetConfig().SMTP_SERVER }
 func GetEmailPort() string         { return GetConfig().SMTP_PORT }
+func GetMLServiceBaseURL() string  { return GetConfig().MLSERVICE_BASE_URL }
 
 func IsProduction() bool         { return GetEnvironment() == "production" }
 func IsDevelopment() bool        { return GetEnvironment() == "development" }

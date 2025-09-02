@@ -7,7 +7,6 @@ import (
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/exceptions"
 	"ragamaya-api/pkg/helpers"
-	"ragamaya-api/pkg/logger"
 
 	walletRepo "ragamaya-api/api/wallets/repositories"
 
@@ -52,16 +51,13 @@ func (s *CompServicesImpl) ClaimGoogleUserData(ctx *gin.Context, accessToken str
 		Get("https://www.googleapis.com/oauth2/v3/userinfo")
 
 	if err != nil {
-		logger.Error("Request error: " + err.Error())
 		return nil, exceptions.NewException(401, exceptions.ErrInvalidCredentials)
 	}
 
 	if resp.IsError() {
-		logger.Error("HTTP error: " + resp.String())
 		return nil, exceptions.NewException(401, exceptions.ErrInvalidCredentials)
 	}
 
-	logger.Info("Success: " + resp.String())
 	return &userInfo, nil
 
 }

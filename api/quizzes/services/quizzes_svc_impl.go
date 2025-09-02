@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
 	"ragamaya-api/api/quizzes/dto"
 	"ragamaya-api/api/quizzes/repositories"
@@ -111,4 +112,38 @@ func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizD
 
 	output := mapper.MapQuizMTDO(*result)
 	return &output, nil
+}
+
+func (s *CompServicesImpl) Analyze(ctx *gin.Context, uuid string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	quizData, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	quiz := mapper.MapQuizMTDO(*quizData)
+
+	if len(data.Answers) != quiz.TotalQuestions {
+		return nil, exceptions.NewValidationException(fmt.Errorf("invalid answers length"))
+	}
+
+	correct := 0
+	for i, q := range quiz.Questions {
+		if data.Answers[i] == q.AnswerIndex {
+			correct++
+		}
+	}
+
+	var result dto.AnalyzeRes
+	result.Score = (float32(correct) / float32(quiz.TotalQuestions)) * 100
+	result.Status = dto.Failed
+	if int(result.Score) >= quiz.MinimumScore {
+		result.Status = dto.Success
+	}
+
+	return &result, nil
 }

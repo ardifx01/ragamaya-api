@@ -43,3 +43,15 @@ type QuizQuestionRes struct {
 	Options     []string `json:"options" validate:"required"`
 	AnswerIndex int      `json:"answer_index" validate:"number,gte=0"`
 }
+
+type AnalyzeStatus string
+
+const (
+	Success AnalyzeStatus = "success"
+	Failed  AnalyzeStatus = "failed"
+)
+
+type AnalyzeRes struct {
+	Score  float32            `json:"score"`
+	Status AnalyzeStatus `json:"match"`
+}

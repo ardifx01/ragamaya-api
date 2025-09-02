@@ -12,4 +12,5 @@ type CompServices interface {
 	FindAllCategories(ctx *gin.Context) ([]dto.CategoryRes, *exceptions.Exception)
 	Search(ctx *gin.Context, data dto.SearchReq) ([]dto.QuizRes, *exceptions.Exception)
 	FindBySlug(ctx *gin.Context, slug string) (*dto.QuizDetailRes, *exceptions.Exception)
+	Analyze(ctx *gin.Context, uuid string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception)
 }

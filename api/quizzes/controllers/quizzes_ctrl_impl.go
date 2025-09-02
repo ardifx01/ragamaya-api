@@ -87,3 +87,30 @@ func (h *CompControllersImpl) FindBySlug(ctx *gin.Context) {
 		Body:    data,
 	})
 }
+
+func (h *CompControllersImpl) Analyze(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	if uuid == "" {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	var data dto.AnalyzeReq
+	jsonErr := ctx.ShouldBindJSON(&data)
+	if jsonErr != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	result, err := h.services.Analyze(ctx, uuid, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    result,
+	})
+}

@@ -84,6 +84,17 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, data dto.Se
 	return quizzes, nil
 }
 
+func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Quiz, *exceptions.Exception) {
+	var quiz models.Quiz
+	err := tx.Where("uuid = ?", uuid).
+		Preload("Category").
+		First(&quiz).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &quiz, nil
+}
+
 func (r *CompRepositoriesImpl) FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Quiz, *exceptions.Exception) {
 	var quiz models.Quiz
 	err := tx.Where("slug = ?", slug).

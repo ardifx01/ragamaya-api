@@ -30,3 +30,7 @@ type SearchReq struct {
 	Level    *QuizLevel `form:"level" validate:"omitempty,oneof=beginner intermediate advanced"`
 	Category *string    `form:"category" validate:"omitempty"`
 }
+
+type AnalyzeReq struct {
+	Answers []int `json:"answers" validate:"required"`
+}

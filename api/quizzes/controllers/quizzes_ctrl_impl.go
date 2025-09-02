@@ -72,3 +72,18 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 		Body:    result,
 	})
 }
+
+func (h *CompControllersImpl) FindBySlug(ctx *gin.Context) {
+	slug := ctx.Param("slug")
+	data, err := h.services.FindBySlug(ctx, slug)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}

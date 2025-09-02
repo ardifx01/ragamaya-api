@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"net/http"
 	"ragamaya-api/api/quizzes/dto"
 	"ragamaya-api/api/quizzes/repositories"
@@ -98,16 +97,18 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.Q
 	var output []dto.QuizRes
 
 	for _, v := range result {
-		item := mapper.MapQuizMTO(v)
-		var questions []dto.QuizQuestionRes
-		err := json.Unmarshal([]byte(v.Questions), &questions)
-		if err != nil {
-			return nil, exceptions.NewException(http.StatusInternalServerError, "try again, if still error: report to customer service")
-		}
-
-		item.TotalQuestions = len(questions)
-		output = append(output, item)
+		output = append(output, mapper.MapQuizMTO(v))
 	}
 
 	return output, nil
+}
+
+func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizDetailRes, *exceptions.Exception) {
+	result, err := s.repo.FindBySlug(ctx, s.DB, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapQuizMTDO(*result)
+	return &output, nil
 }

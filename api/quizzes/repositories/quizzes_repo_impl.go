@@ -83,3 +83,14 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, data dto.Se
 	}
 	return quizzes, nil
 }
+
+func (r *CompRepositoriesImpl) FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Quiz, *exceptions.Exception) {
+	var quiz models.Quiz
+	err := tx.Where("slug = ?", slug).
+		Preload("Category").
+		First(&quiz).Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &quiz, nil
+}

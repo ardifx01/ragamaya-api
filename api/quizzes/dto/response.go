@@ -23,6 +23,19 @@ type QuizRes struct {
 	Category *CategoryRes `json:"category"`
 }
 
+type QuizDetailRes struct {
+	UUID           string    `json:"uuid"`
+	Slug           string    `json:"slug"`
+	Title          string    `json:"title"`
+	Level          QuizLevel `json:"level"`
+	Estimate       int       `json:"estimate"`
+	MinimumScore   int       `json:"minimum_score"`
+	TotalQuestions int       `json:"total_questions"`
+
+	Questions []QuizQuestionRes `json:"questions"`
+	Category  *CategoryRes      `json:"category"`
+}
+
 type QuizQuestionRes struct {
 	Question    string   `json:"question" validate:"required"`
 	Options     []string `json:"options" validate:"required"`

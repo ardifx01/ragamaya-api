@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"encoding/json"
 	"ragamaya-api/api/quizzes/dto"
 	"ragamaya-api/models"
 
@@ -9,7 +10,6 @@ import (
 
 func MapQuizCategoryMTO(input models.QuizCategory) dto.CategoryRes {
 	var output dto.CategoryRes
-
 	mapstructure.Decode(input, &output)
 	return output
 }
@@ -23,5 +23,18 @@ func MapQuizITM(input dto.QuizReq) models.Quiz {
 func MapQuizMTO(model models.Quiz) dto.QuizRes {
 	var output dto.QuizRes
 	mapstructure.Decode(model, &output)
+	var questions []dto.QuizQuestionRes
+	json.Unmarshal([]byte(model.Questions), &questions)
+	output.TotalQuestions = len(questions)
+	return output
+}
+
+func MapQuizMTDO(model models.Quiz) dto.QuizDetailRes {
+	var output dto.QuizDetailRes
+	mapstructure.Decode(model, &output)
+	var questions []dto.QuizQuestionRes
+	json.Unmarshal([]byte(model.Questions), &questions)
+	output.Questions = questions
+	output.TotalQuestions = len(questions)
 	return output
 }

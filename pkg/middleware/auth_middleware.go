@@ -16,20 +16,23 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		secret := config.GetJWTSecret()
 		var secretKey = []byte(secret)
+		var tokenString string
 
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
+		if authHeader != "" {
+			authHeaderParts := strings.Split(authHeader, " ")
+			if len(authHeaderParts) != 2 || authHeaderParts[0] != "Bearer" {
+				c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrInvalidCredentials))
+				return
+			} else {
+				tokenString = authHeaderParts[1]
+			}
+		} else if c.Query("authorization") != "" {
+			tokenString = c.Query("authorization")
+		} else {
 			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrForbidden))
 			return
 		}
-
-		authHeaderParts := strings.Split(authHeader, " ")
-		if len(authHeaderParts) != 2 || authHeaderParts[0] != "Bearer" {
-			c.AbortWithStatusJSON(http.StatusForbidden, exceptions.NewException(http.StatusForbidden, exceptions.ErrInvalidCredentials))
-			return
-		}
-
-		tokenString := authHeaderParts[1]
 
 		isBlacklisted, _ := helpers.IsTokenBlacklisted(tokenString)
 		if isBlacklisted {

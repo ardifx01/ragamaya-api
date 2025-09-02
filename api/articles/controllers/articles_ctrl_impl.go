@@ -74,6 +74,21 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 	})
 }
 
+func (h *CompControllersImpl) FindBySlug(ctx *gin.Context) {
+	slug := ctx.Param("slug")
+	data, err := h.services.FindBySlug(ctx, slug)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}
+
 func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 	uuid := ctx.Param("uuid")
 	err := h.services.Delete(ctx, uuid)

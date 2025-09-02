@@ -11,5 +11,6 @@ func ArticleRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 	{
 		articleGroup.GET("/categories", compControllers.FindAllCategories)
 		articleGroup.GET("/search", compControllers.Search)
+		articleGroup.GET("/:slug", compControllers.FindBySlug)
 	}
 }

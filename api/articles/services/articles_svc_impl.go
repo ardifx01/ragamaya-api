@@ -108,6 +108,16 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.A
 	return output, nil
 }
 
+func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.ArticleRes, *exceptions.Exception) {
+	result, err := s.repo.FindBySlug(ctx, s.DB, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapArticleMTO(*result)
+	return &output, nil
+}
+
 func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
 	return s.repo.Delete(ctx, s.DB, uuid)
 }

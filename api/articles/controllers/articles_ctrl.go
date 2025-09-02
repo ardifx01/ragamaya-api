@@ -7,5 +7,6 @@ type CompControllers interface {
 	Create(ctx *gin.Context)
 	Search(ctx *gin.Context)
 	FindBySlug(ctx *gin.Context)
+	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
 }

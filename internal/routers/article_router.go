@@ -13,6 +13,7 @@ func ArticleRoutes(r *gin.RouterGroup, compControllers controllers.CompControlle
 		articleGroup.GET("/search", compControllers.Search)
 		articleGroup.GET("/:slug", compControllers.FindBySlug)
 		articleGroup.POST("/create", compControllers.Create)
+		articleGroup.PUT("/update/:uuid", compControllers.Update)
 		articleGroup.DELETE("/delete/:uuid", compControllers.Delete)
 	}
 }

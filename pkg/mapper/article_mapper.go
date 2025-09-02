@@ -21,6 +21,13 @@ func MapArticleITM(input dto.ArticleReq) models.Article {
 	return output
 }
 
+func MapArticleUTM(input dto.ArticleUpdateReq) models.Article {
+	var output models.Article
+
+	mapstructure.Decode(input, &output)
+	return output
+}
+
 func MapArticleMTO(input models.Article) dto.ArticleRes {
 	var output dto.ArticleRes
 

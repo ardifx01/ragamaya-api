@@ -44,6 +44,26 @@ func (s *CompServicesImpl) FindAllCategories(ctx *gin.Context) ([]dto.CategoryRe
 	return result, nil
 }
 
+func (s *CompServicesImpl) FindOrCreateCategory(ctx *gin.Context, tx *gorm.DB, category string) (*models.ArticleCategory, *exceptions.Exception) {
+	existCategory, err := s.repo.FindCategoryByName(ctx, tx, category)
+	if err != nil {
+		if err.Status == http.StatusNotFound && existCategory == nil {
+			existCategory = &models.ArticleCategory{
+				UUID: uuid.NewString(),
+				Name: category,
+			}
+			err = s.repo.CreateCategory(ctx, tx, *existCategory)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+
+	return existCategory, nil
+}
+
 func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.ArticleReq) (*dto.ArticleRes, *exceptions.Exception) {
 	validateErr := s.validate.Struct(data)
 	if validateErr != nil {
@@ -53,20 +73,9 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.ArticleReq) (*dto.A
 	tx := s.DB.Begin()
 	defer helpers.CommitOrRollback(tx)
 
-	existCategory, err := s.repo.FindCategoryByName(ctx, tx, data.Category)
+	existCategory, err := s.FindOrCreateCategory(ctx, tx, data.Category)
 	if err != nil {
-		if err.Status == http.StatusNotFound && existCategory == nil {
-			existCategory = &models.ArticleCategory{
-				UUID: uuid.NewString(),
-				Name: data.Category,
-			}
-			err = s.repo.CreateCategory(ctx, tx, *existCategory)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			return nil, err
-		}
+		return nil, err
 	}
 
 	input := mapper.MapArticleITM(data)
@@ -110,6 +119,38 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.A
 
 func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.ArticleRes, *exceptions.Exception) {
 	result, err := s.repo.FindBySlug(ctx, s.DB, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapArticleMTO(*result)
+	return &output, nil
+}
+
+func (s *CompServicesImpl) Update(ctx *gin.Context, data dto.ArticleUpdateReq) (*dto.ArticleRes, *exceptions.Exception) {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return nil, exceptions.NewValidationException(validateErr)
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	existCategory, err := s.FindOrCreateCategory(ctx, tx, data.Category)
+	if err != nil {
+		return nil, err
+	}
+
+	input := mapper.MapArticleUTM(data)
+	input.Slug = helpers.SlugifyUnique(data.Title)
+	input.CategoryUUID = existCategory.UUID
+
+	err = s.repo.Update(ctx, tx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := s.repo.FindByUUID(ctx, tx, input.UUID)
 	if err != nil {
 		return nil, err
 	}

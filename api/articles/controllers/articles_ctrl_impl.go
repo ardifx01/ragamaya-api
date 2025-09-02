@@ -89,6 +89,28 @@ func (h *CompControllersImpl) FindBySlug(ctx *gin.Context) {
 	})
 }
 
+func (h *CompControllersImpl) Update(ctx *gin.Context) {
+	var data dto.ArticleUpdateReq
+	jsonErr := ctx.ShouldBindJSON(&data)
+	if jsonErr != nil {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	data.UUID = ctx.Param("uuid")
+	result, err := h.services.Update(ctx, data)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Body:    result,
+		Message: "update success",
+	})
+}
+
 func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 	uuid := ctx.Param("uuid")
 	err := h.services.Delete(ctx, uuid)

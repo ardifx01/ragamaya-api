@@ -17,5 +17,6 @@ type CompRepositories interface {
 	FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Article, *exceptions.Exception)
 	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Article, *exceptions.Exception)
 	Search(ctx *gin.Context, tx *gorm.DB, data dto.SearchReq) ([]models.Article, *exceptions.Exception)
-	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception 
+	Update(ctx *gin.Context, tx *gorm.DB, data models.Article) *exceptions.Exception
+	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 }

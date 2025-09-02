@@ -15,6 +15,7 @@ type QuizRes struct {
 	UUID           string    `json:"uuid"`
 	Slug           string    `json:"slug"`
 	Title          string    `json:"title"`
+	Desc           string    `json:"desc"`
 	Level          QuizLevel `json:"level"`
 	Estimate       int       `json:"estimate"`
 	MinimumScore   int       `json:"minimum_score"`
@@ -27,6 +28,7 @@ type QuizDetailRes struct {
 	UUID           string    `json:"uuid"`
 	Slug           string    `json:"slug"`
 	Title          string    `json:"title"`
+	Desc           string    `json:"desc"`
 	Level          QuizLevel `json:"level"`
 	Estimate       int       `json:"estimate"`
 	MinimumScore   int       `json:"minimum_score"`

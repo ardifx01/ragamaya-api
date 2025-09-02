@@ -10,6 +10,7 @@ const (
 
 type QuizReq struct {
 	Title        string    `json:"title" validate:"required"`
+	Desc         string    `json:"desc" validate:"required"`
 	Level        QuizLevel `json:"level" validate:"required,oneof=beginner intermediate advanced"`
 	Category     string    `json:"category" validate:"required"`
 	Estimate     int       `json:"estimate" validate:"required"`

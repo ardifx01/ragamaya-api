@@ -37,7 +37,8 @@ type Quiz struct {
 	Slug         string `gorm:"not null;unique;index"`
 	CategoryUUID string `gorm:"not null"`
 
-	Title        string    `gorm:"not null"`
+	Title        string `gorm:"not null"`
+	Desc         string
 	Level        QuizLevel `gorm:"not null;index"`
 	Estimate     int       `gorm:"not null"`
 	MinimumScore int       `gorm:"not null"`

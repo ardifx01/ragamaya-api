@@ -17,8 +17,8 @@ type ProductRes struct {
 	Stock       int         `json:"stock" validate:"required"`
 	Keywords    string      `json:"keywords" validate:"required"`
 
-	Thumbnails   []ProductThumbnailsRes   `json:"thumbnails" validate:"required,dive"`
-	DigitalFiles []ProductDigitalFiles `json:"digital_files" validate:"required,dive"`
+	Thumbnails   []ProductThumbnailsRes `json:"thumbnails" validate:"required,dive"`
+	DigitalFiles []ProductDigitalFiles  `json:"digital_files,omitempty" validate:"required,dive"`
 }
 
 type ProductThumbnailsRes struct {
@@ -28,7 +28,7 @@ type ProductThumbnailsRes struct {
 
 type ProductDigitalFilesRes struct {
 	UUID        string `json:"uuid"`
-	FileURL     string `json:"file_url" validate:"required,url"`
+	FileURL     string `json:"file_url,omitempty" validate:"url"`
 	Description string `json:"description" validate:"required"`
 	Extension   string `json:"extension" validate:"required"`
 }

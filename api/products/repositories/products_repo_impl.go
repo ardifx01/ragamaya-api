@@ -34,7 +34,9 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 		Where("uuid = ?", uuid).
 		Preload("Seller").
 		Preload("Thumbnails").
-		Preload("DigitalFiles").
+		Preload("DigitalFiles", func(db *gorm.DB) *gorm.DB {
+			return db.Omit("file_url")
+		}).
 		First(&seller).
 		Error
 	if err != nil {
@@ -66,13 +68,15 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, searchReq d
 	query := tx.WithContext(ctx).
 		Model(&models.Products{}).
 		Preload("Thumbnails").
-		Preload("DigitalFiles")
+		Preload("DigitalFiles", func(db *gorm.DB) *gorm.DB {
+			return db.Omit("file_url")
+		})
 
 	if searchReq.Keyword != nil && *searchReq.Keyword != "" {
 		kw := fmt.Sprintf("%%%s%%", *searchReq.Keyword)
 		query = query.Where(
 			tx.Where("name ILIKE ?", kw).
-			Or("description ILIKE ?", kw).
+				Or("description ILIKE ?", kw).
 				Or("keywords ILIKE ?", kw),
 		)
 	}
@@ -104,7 +108,7 @@ func (r *CompRepositoriesImpl) Search(ctx *gin.Context, tx *gorm.DB, searchReq d
 	if searchReq.PageSize != nil {
 		pageSize = *searchReq.PageSize
 	}
-	
+
 	offset := (page - 1) * pageSize
 
 	if err := query.

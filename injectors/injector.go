@@ -46,6 +46,10 @@ import (
 	predictRepositories "ragamaya-api/api/predicts/repositories"
 	predictServices "ragamaya-api/api/predicts/services"
 	
+	analyticControllers "ragamaya-api/api/analytics/controllers"
+	analyticRepositories "ragamaya-api/api/analytics/repositories"
+	analyticServices "ragamaya-api/api/analytics/services"
+	
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
@@ -123,6 +127,12 @@ var predictFeatureSet = wire.NewSet(
 	predictControllers.NewCompController,
 )
 
+var analyticFeatureSet = wire.NewSet(
+	analyticRepositories.NewComponentRepository,
+	analyticServices.NewComponentServices,
+	analyticControllers.NewCompController,
+)
+
 func InitializeUserController(db *gorm.DB, validate *validator.Validate) userControllers.CompControllers {
 	wire.Build(userFeatureSet)
 	return nil
@@ -170,5 +180,10 @@ func InitializeQuizController(db *gorm.DB, s3client *s3.Client,  validate *valid
 
 func InitializePredictController(db *gorm.DB, validate *validator.Validate) predictControllers.CompControllers {
 	wire.Build(predictFeatureSet)
+	return nil
+}
+
+func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate) analyticControllers.CompControllers {
+	wire.Build(analyticFeatureSet)
 	return nil
 }

@@ -12,6 +12,9 @@ import (
 	"github.com/google/wire"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
+	controllers11 "ragamaya-api/api/analytics/controllers"
+	repositories11 "ragamaya-api/api/analytics/repositories"
+	services11 "ragamaya-api/api/analytics/services"
 	controllers8 "ragamaya-api/api/articles/controllers"
 	repositories8 "ragamaya-api/api/articles/repositories"
 	services8 "ragamaya-api/api/articles/services"
@@ -122,6 +125,13 @@ func InitializePredictController(db *gorm.DB, validate *validator.Validate) cont
 	return compControllers
 }
 
+func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate) controllers11.CompControllers {
+	compRepositories := repositories11.NewComponentRepository()
+	compServices := services11.NewComponentServices(compRepositories, db, validate)
+	compControllers := controllers11.NewCompController(compServices)
+	return compControllers
+}
+
 // injector.go:
 
 var userFeatureSet = wire.NewSet(repositories.NewComponentRepository, services.NewComponentServices, controllers.NewCompController, repositories2.NewComponentRepository)
@@ -143,3 +153,5 @@ var articleFeatureSet = wire.NewSet(repositories8.NewComponentRepository, servic
 var quizFeatureSet = wire.NewSet(repositories9.NewComponentRepository, services9.NewComponentServices, controllers9.NewCompController, repositories3.NewComponentRepository, services2.NewComponentServices)
 
 var predictFeatureSet = wire.NewSet(repositories10.NewComponentRepository, services10.NewComponentServices, controllers10.NewCompController)
+
+var analyticFeatureSet = wire.NewSet(repositories11.NewComponentRepository, services11.NewComponentServices, controllers11.NewCompController)

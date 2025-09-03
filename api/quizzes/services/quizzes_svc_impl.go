@@ -238,29 +238,66 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 	if err != nil {
 		return nil, exceptions.NewException(500, fmt.Sprintf("template parse error: %s", err))
 	}
-
+	
 	var bufHTML bytes.Buffer
 	if err := tmpl.Execute(&bufHTML, data); err != nil {
 		logger.Error("template execute error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-
+	
 	tempFile, err := os.CreateTemp("", "cert_*.html")
 	if err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
 	defer os.Remove(tempFile.Name())
-
+	
 	if _, err := tempFile.Write(bufHTML.Bytes()); err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
 	tempFile.Close()
 
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.DisableGPU,
+		chromedp.NoSandbox,
+		chromedp.Headless,
+		chromedp.Flag("disable-background-timer-throttling", true),
+		chromedp.Flag("disable-backgrounding-occluded-windows", true),
+		chromedp.Flag("disable-renderer-backgrounding", true),
+		chromedp.Flag("disable-features", "TranslateUI"),
+		chromedp.Flag("disable-ipc-flooding-protection", true),
+	)
 
+	chromePath := os.Getenv("CHROME_PATH")
+	if chromePath == "" {
+		chromePath = os.Getenv("CHROME_BIN")
+	}
+	if chromePath == "" {
+		possiblePaths := []string{
+			"/usr/bin/chromium-browser",
+			"/usr/bin/chromium",
+			"/usr/bin/google-chrome-stable",
+			"/usr/bin/google-chrome",
+		}
+		for _, path := range possiblePaths {
+			if _, err := os.Stat(path); err == nil {
+				chromePath = path
+				break
+			}
+		}
+	}
+	
+	if chromePath != "" {
+		opts = append(opts, chromedp.ExecPath(chromePath))
+	}
+
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+	
+	ctx, cancel := chromedp.NewContext(allocCtx)
+	defer cancel()
+	
 	var pdfBuf []byte
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate("file://" + tempFile.Name()),
@@ -281,17 +318,17 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 			return err
 		}),
 	})
-
+	
 	if err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-
+	
 	if len(pdfBuf) == 0 {
-		logger.Error("generate certificate error: %v", err)
+		logger.Error("generate certificate error: empty PDF buffer")
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-
+	
 	return &pdfBuf, nil
 }
 

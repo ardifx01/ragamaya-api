@@ -10,3 +10,7 @@ services:
       - 1.1.1.1
     ports:
       - "${PORT}:${PORT}"
+    shm_size: '2gb'
+    environment:
+      - CHROME_BIN=/usr/bin/google-chrome
+      - CHROME_PATH=/usr/bin/google-chrome

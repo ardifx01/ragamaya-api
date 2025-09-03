@@ -122,6 +122,14 @@ func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string
 	return nil
 }
 
+func (r *CompRepositoriesImpl) CreateAttempt(ctx *gin.Context, tx *gorm.DB, data models.QuizAttempt) *exceptions.Exception {
+	result := tx.Create(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+	return nil
+}
+
 func (r *CompRepositoriesImpl) CreateCertificate(ctx *gin.Context, tx *gorm.DB, data models.QuizCertificate) *exceptions.Exception {
 	result := tx.Create(&data)
 	if result.Error != nil {

@@ -71,3 +71,21 @@ type QuizCertificate struct {
 	Quiz *Quiz  `gorm:"foreignKey:QuizUUID;references:UUID"`
 	User *Users `gorm:"foreignKey:UserUUID;references:UUID"`
 }
+
+type QuizAttempt struct {
+	gorm.Model
+
+	ID       uint   `gorm:"primaryKey"`
+	QuizUUID string `gorm:"not null;index"`
+	UserUUID string `gorm:"not null;index"`
+
+	Score  float32 `gorm:"not null"`
+	Status string  `gorm:"not null"`
+
+	CreatedAt time.Time  `gorm:"not null"`
+	UpdatedAt time.Time  `gorm:"not null"`
+	DeletedAt *time.Time `gorm:"index"`
+
+	Quiz *Quiz  `gorm:"foreignKey:QuizUUID;references:UUID"`
+	User *Users `gorm:"foreignKey:UserUUID;references:UUID"`
+}

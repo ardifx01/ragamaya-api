@@ -181,6 +181,16 @@ func (s *CompServicesImpl) Analyze(ctx *gin.Context, quizUUID string, data dto.A
 		result.Status = dto.Success
 	}
 
+	err = s.repo.CreateAttempt(ctx, tx, models.QuizAttempt{
+		QuizUUID: quizUUID,
+		UserUUID: userData.UUID,
+		Score:    result.Score,
+		Status:   string(result.Status),
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	if result.Status == dto.Success {
 		certificateData := &models.QuizCertificate{
 			UUID:     uuid.NewString(),
@@ -238,20 +248,20 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 	if err != nil {
 		return nil, exceptions.NewException(500, fmt.Sprintf("template parse error: %s", err))
 	}
-	
+
 	var bufHTML bytes.Buffer
 	if err := tmpl.Execute(&bufHTML, data); err != nil {
 		logger.Error("template execute error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-	
+
 	tempFile, err := os.CreateTemp("", "cert_*.html")
 	if err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
 	defer os.Remove(tempFile.Name())
-	
+
 	if _, err := tempFile.Write(bufHTML.Bytes()); err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
@@ -287,17 +297,17 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 			}
 		}
 	}
-	
+
 	if chromePath != "" {
 		opts = append(opts, chromedp.ExecPath(chromePath))
 	}
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	defer cancel()
-	
+
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
-	
+
 	var pdfBuf []byte
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate("file://" + tempFile.Name()),
@@ -318,17 +328,17 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 			return err
 		}),
 	})
-	
+
 	if err != nil {
 		logger.Error("generate certificate error: %v", err)
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-	
+
 	if len(pdfBuf) == 0 {
 		logger.Error("generate certificate error: empty PDF buffer")
 		return nil, exceptions.NewException(500, exceptions.ErrInternalServer)
 	}
-	
+
 	return &pdfBuf, nil
 }
 

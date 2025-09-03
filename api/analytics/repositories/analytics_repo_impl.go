@@ -234,10 +234,10 @@ func (r *CompRepositoriesImpl) FindMonthlyQuizTaken(ctx *gin.Context, tx *gorm.D
 			FROM generate_series(0, 11) gs
 		)
 		SELECT m.month as Month,
-			COALESCE(COUNT(qc.uuid), 0) as Total
+			COALESCE(COUNT(qa.id), 0) as Total
 		FROM months m
-		LEFT JOIN quiz_certificates qc 
-			ON TO_CHAR(qc.created_at, 'YYYY-MM') = m.month
+		LEFT JOIN quiz_attempts qa 
+			ON TO_CHAR(qa.created_at, 'YYYY-MM') = m.month
 		GROUP BY m.month
 		ORDER BY m.month DESC;
 	`
@@ -264,7 +264,7 @@ func (r *CompRepositoriesImpl) FindMonthlyCertificates(ctx *gin.Context, tx *gor
 func (r *CompRepositoriesImpl) FindQuizCompletionRate(ctx *gin.Context, tx *gorm.DB) (float64, *exceptions.Exception) {
 	// Get total number of quiz attempts
 	var totalAttempts float64
-	err := tx.Model(&models.QuizCertificate{}).
+	err := tx.Model(&models.QuizAttempt{}).
 		Select("COUNT(*)").
 		Row().
 		Scan(&totalAttempts)
@@ -275,7 +275,6 @@ func (r *CompRepositoriesImpl) FindQuizCompletionRate(ctx *gin.Context, tx *gorm
 	// Get total number of successful completions
 	var successfulCompletions float64
 	err = tx.Model(&models.QuizCertificate{}).
-		Where("passed = ?", true).
 		Select("COUNT(*)").
 		Row().
 		Scan(&successfulCompletions)

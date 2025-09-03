@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: your-app
+    container_name: ragamaya-api
     ports:
       - "8013:8013"
     restart: unless-stopped

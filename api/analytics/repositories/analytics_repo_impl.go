@@ -17,7 +17,6 @@ func NewComponentRepository() CompRepositories {
 	return &CompRepositoriesImpl{}
 }
 
-// Product Analytics Implementation
 func (r *CompRepositoriesImpl) FindTotalProducts(ctx *gin.Context, tx *gorm.DB) (int64, *exceptions.Exception) {
 	var total int64
 	err := tx.Model(&models.Products{}).Count(&total).Error
@@ -73,7 +72,6 @@ func (r *CompRepositoriesImpl) FindMonthlyNewProducts(ctx *gin.Context, tx *gorm
 	return results, nil
 }
 
-// User Analytics Implementation
 func (r *CompRepositoriesImpl) FindTotalUsers(ctx *gin.Context, tx *gorm.DB) (int64, *exceptions.Exception) {
 	var total int64
 	err := tx.Model(&models.Users{}).Count(&total).Error
@@ -144,7 +142,6 @@ func (r *CompRepositoriesImpl) FindMonthlyNewSellers(ctx *gin.Context, tx *gorm.
 	return results, nil
 }
 
-// Revenue Analytics Implementation
 func (r *CompRepositoriesImpl) FindTotalRevenue(ctx *gin.Context, tx *gorm.DB) (int64, *exceptions.Exception) {
 	var total int64
 	err := tx.Model(&models.Orders{}).
@@ -207,7 +204,6 @@ func (r *CompRepositoriesImpl) FindRevenueByProductType(ctx *gin.Context, tx *go
 	return results, nil
 }
 
-// Platform Analytics Implementation
 func (r *CompRepositoriesImpl) FindTotalQuizzes(ctx *gin.Context, tx *gorm.DB) (int64, *exceptions.Exception) {
 	var total int64
 	err := tx.Model(&models.Quiz{}).Count(&total).Error
@@ -262,7 +258,7 @@ func (r *CompRepositoriesImpl) FindMonthlyCertificates(ctx *gin.Context, tx *gor
 }
 
 func (r *CompRepositoriesImpl) FindQuizCompletionRate(ctx *gin.Context, tx *gorm.DB) (float64, *exceptions.Exception) {
-	// Get total number of quiz attempts
+
 	var totalAttempts float64
 	err := tx.Model(&models.QuizAttempt{}).
 		Select("COUNT(*)").
@@ -272,7 +268,6 @@ func (r *CompRepositoriesImpl) FindQuizCompletionRate(ctx *gin.Context, tx *gorm
 		return 0, exceptions.ParseGormError(tx, err)
 	}
 
-	// Get total number of successful completions
 	var successfulCompletions float64
 	err = tx.Model(&models.QuizCertificate{}).
 		Select("COUNT(*)").

@@ -26,37 +26,31 @@ func NewComponentServices(compRepositories repositories.CompRepositories, db *go
 }
 
 func (s *CompServicesImpl) GetAnalytics(ctx *gin.Context) (*dto.AnalyticRes, *exceptions.Exception) {
-	// Get order analytics
 	orderAnalytics, err := s.getOrderAnalytics(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get payout analytics
 	payoutAnalytics, err := s.getPayoutAnalytics(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get product analytics
 	productAnalytics, err := s.getProductAnalytics(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get user analytics
 	userAnalytics, err := s.getUserAnalytics(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get revenue analytics
 	revenueAnalytics, err := s.getRevenueAnalytics(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get platform analytics
 	platformAnalytics, err := s.getPlatformAnalytics(ctx)
 	if err != nil {
 		return nil, err
@@ -73,25 +67,21 @@ func (s *CompServicesImpl) GetAnalytics(ctx *gin.Context) (*dto.AnalyticRes, *ex
 }
 
 func (s *CompServicesImpl) getOrderAnalytics(ctx *gin.Context) (*dto.AnalyticOrderRes, *exceptions.Exception) {
-	// Get total orders
 	totalOrder, err := s.repo.FindTotalOrders(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total successful orders
 	totalOrderSuccess, err := s.repo.FindTotalOrdersByStatus(ctx, s.DB, "settlement")
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total failed orders
 	totalOrderFailed, err := s.repo.FindTotalOrdersByStatus(ctx, s.DB, "expire")
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly orders for the last 12 months
 	monthlyOrders, err := s.repo.FindMonthlyOrders(ctx, s.DB, "")
 	if err != nil {
 		return nil, err
@@ -118,25 +108,21 @@ func (s *CompServicesImpl) getOrderAnalytics(ctx *gin.Context) (*dto.AnalyticOrd
 }
 
 func (s *CompServicesImpl) getPayoutAnalytics(ctx *gin.Context) (*dto.AnalyticPayoutRes, *exceptions.Exception) {
-	// Get total payouts
 	totalPayout, err := s.repo.FindTotalPayouts(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total successful payouts
 	totalPayoutSuccess, err := s.repo.FindTotalPayoutsByStatus(ctx, s.DB, string(models.Completed))
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total failed payouts
 	totalPayoutFailed, err := s.repo.FindTotalPayoutsByStatus(ctx, s.DB, string(models.Failed))
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly payouts for the last 12 months
 	monthlyPayouts, err := s.repo.FindMonthlyPayouts(ctx, s.DB, "")
 	if err != nil {
 		return nil, err
@@ -163,13 +149,11 @@ func (s *CompServicesImpl) getPayoutAnalytics(ctx *gin.Context) (*dto.AnalyticPa
 }
 
 func (s *CompServicesImpl) getProductAnalytics(ctx *gin.Context) (*dto.AnalyticProductRes, *exceptions.Exception) {
-	// Get total products
 	totalProducts, err := s.repo.FindTotalProducts(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total products by type
 	totalDigital, err := s.repo.FindTotalProductsByType(ctx, s.DB, "digital")
 	if err != nil {
 		return nil, err
@@ -180,13 +164,11 @@ func (s *CompServicesImpl) getProductAnalytics(ctx *gin.Context) (*dto.AnalyticP
 		return nil, err
 	}
 
-	// Get top selling products
-	topSellingProducts, err := s.repo.FindTopSellingProducts(ctx, s.DB, 10) // top 10 products
+	topSellingProducts, err := s.repo.FindTopSellingProducts(ctx, s.DB, 10)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly new products
 	monthlyNewProducts, err := s.repo.FindMonthlyNewProducts(ctx, s.DB)
 	if err != nil {
 		return nil, err
@@ -202,31 +184,26 @@ func (s *CompServicesImpl) getProductAnalytics(ctx *gin.Context) (*dto.AnalyticP
 }
 
 func (s *CompServicesImpl) getUserAnalytics(ctx *gin.Context) (*dto.AnalyticUserRes, *exceptions.Exception) {
-	// Get total users
 	totalUsers, err := s.repo.FindTotalUsers(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total sellers
 	totalSellers, err := s.repo.FindTotalSellers(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total verified users
 	totalVerifiedUsers, err := s.repo.FindTotalVerifiedUsers(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly new users
 	monthlyNewUsers, err := s.repo.FindMonthlyNewUsers(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly new sellers
 	monthlyNewSellers, err := s.repo.FindMonthlyNewSellers(ctx, s.DB)
 	if err != nil {
 		return nil, err
@@ -242,25 +219,21 @@ func (s *CompServicesImpl) getUserAnalytics(ctx *gin.Context) (*dto.AnalyticUser
 }
 
 func (s *CompServicesImpl) getRevenueAnalytics(ctx *gin.Context) (*dto.AnalyticRevenueRes, *exceptions.Exception) {
-	// Get total revenue
 	totalRevenue, err := s.repo.FindTotalRevenue(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly revenue
 	monthlyRevenue, err := s.repo.FindMonthlyRevenue(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get average order value
 	averageOrderValue, err := s.repo.FindAverageOrderValue(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get revenue by product type
 	revenueByProductType, err := s.repo.FindRevenueByProductType(ctx, s.DB)
 	if err != nil {
 		return nil, err
@@ -275,41 +248,36 @@ func (s *CompServicesImpl) getRevenueAnalytics(ctx *gin.Context) (*dto.AnalyticR
 }
 
 func (s *CompServicesImpl) getPlatformAnalytics(ctx *gin.Context) (*dto.AnalyticPlatformRes, *exceptions.Exception) {
-	// Get total quizzes
 	totalQuizzes, err := s.repo.FindTotalQuizzes(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total certificates
 	totalCertificates, err := s.repo.FindTotalCertificates(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly quiz taken
 	monthlyQuizTaken, err := s.repo.FindMonthlyQuizTaken(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get monthly certificates
 	monthlyCertificates, err := s.repo.FindMonthlyCertificates(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get quiz completion rate
 	quizCompletionRate, err := s.repo.FindQuizCompletionRate(ctx, s.DB)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dto.AnalyticPlatformRes{
-		TotalQuizzes:         totalQuizzes,
-		TotalCertificates:    totalCertificates,
-		QuizCompletionRate:   quizCompletionRate,
-		MonthlyQuizTaken:     monthlyQuizTaken,
-		MonthlyCertificates:  monthlyCertificates,
+		TotalQuizzes:        totalQuizzes,
+		TotalCertificates:   totalCertificates,
+		QuizCompletionRate:  quizCompletionRate,
+		MonthlyQuizTaken:    monthlyQuizTaken,
+		MonthlyCertificates: monthlyCertificates,
 	}, nil
 }

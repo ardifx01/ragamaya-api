@@ -121,13 +121,13 @@ func (s *CompServicesImpl) Search(ctx *gin.Context, data dto.SearchReq) ([]dto.Q
 	return output, nil
 }
 
-func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizDetailRes, *exceptions.Exception) {
+func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizPublicDetailRes, *exceptions.Exception) {
 	result, err := s.repo.FindBySlug(ctx, s.DB, slug)
 	if err != nil {
 		return nil, err
 	}
 
-	output := mapper.MapQuizMTDO(*result)
+	output := mapper.MapQuizMTPDO(*result)
 	return &output, nil
 }
 

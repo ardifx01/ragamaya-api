@@ -45,6 +45,16 @@ func MapQuizMTDO(model models.Quiz) dto.QuizDetailRes {
 	return output
 }
 
+func MapQuizMTPDO(model models.Quiz) dto.QuizPublicDetailRes {
+	var output dto.QuizPublicDetailRes
+	mapstructure.Decode(model, &output)
+	var questions []dto.QuizPublicQuestionRes
+	json.Unmarshal([]byte(model.Questions), &questions)
+	output.Questions = questions
+	output.TotalQuestions = len(questions)
+	return output
+}
+
 func MapCertificateMTO(model models.QuizCertificate) dto.CertificateRes {
 	var output dto.CertificateRes
 	mapstructure.Decode(model, &output)

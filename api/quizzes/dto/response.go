@@ -46,6 +46,25 @@ type QuizQuestionRes struct {
 	AnswerIndex int      `json:"answer_index" validate:"number,gte=0"`
 }
 
+type QuizPublicDetailRes struct {
+	UUID           string    `json:"uuid"`
+	Slug           string    `json:"slug"`
+	Title          string    `json:"title"`
+	Desc           string    `json:"desc"`
+	Level          QuizLevel `json:"level"`
+	Estimate       int       `json:"estimate"`
+	MinimumScore   int       `json:"minimum_score"`
+	TotalQuestions int       `json:"total_questions"`
+
+	Questions []QuizPublicQuestionRes `json:"questions"`
+	Category  *CategoryRes      `json:"category"`
+}
+
+type QuizPublicQuestionRes struct {
+	Question    string   `json:"question" validate:"required"`
+	Options     []string `json:"options" validate:"required"`
+}
+
 type AnalyzeStatus string
 
 const (

@@ -20,6 +20,12 @@ func MapQuizITM(input dto.QuizReq) models.Quiz {
 	return data
 }
 
+func MapQuizUTM(input dto.QuizUpdateReq) models.Quiz {
+	var data models.Quiz
+	mapstructure.Decode(input, &data)
+	return data
+}
+
 func MapQuizMTO(model models.Quiz) dto.QuizRes {
 	var output dto.QuizRes
 	mapstructure.Decode(model, &output)

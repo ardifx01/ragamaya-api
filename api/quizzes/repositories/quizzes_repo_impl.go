@@ -106,6 +106,22 @@ func (r *CompRepositoriesImpl) FindBySlug(ctx *gin.Context, tx *gorm.DB, slug st
 	return &quiz, nil
 }
 
+func (r *CompRepositoriesImpl) Update(ctx *gin.Context, tx *gorm.DB, data models.Quiz) *exceptions.Exception {
+	result := tx.Where("uuid = ?", data.UUID).Updates(&data)
+	if result.Error != nil {
+		return exceptions.ParseGormError(tx, result.Error)
+	}
+	return nil
+}
+
+func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
+	err := tx.Where("uuid = ?", uuid).Delete(&models.Quiz{}).Error
+	if err != nil {
+		return exceptions.ParseGormError(tx, err)
+	}
+	return nil
+}
+
 func (r *CompRepositoriesImpl) CreateCertificate(ctx *gin.Context, tx *gorm.DB, data models.QuizCertificate) *exceptions.Exception {
 	result := tx.Create(&data)
 	if result.Error != nil {
@@ -145,12 +161,4 @@ func (r *CompRepositoriesImpl) FindCertificateByQuizUUIDandUserUUID(ctx *gin.Con
 		return nil, exceptions.ParseGormError(tx, err)
 	}
 	return &certificate, nil
-}
-
-func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
-	err := tx.Where("uuid = ?", uuid).Delete(&models.Quiz{}).Error
-	if err != nil {
-		return exceptions.ParseGormError(tx, err)
-	}
-	return nil
 }

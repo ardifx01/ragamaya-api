@@ -13,5 +13,6 @@ type CompServices interface {
 	Search(ctx *gin.Context, data dto.SearchReq) ([]dto.QuizRes, *exceptions.Exception)
 	FindBySlug(ctx *gin.Context, slug string) (*dto.QuizDetailRes, *exceptions.Exception)
 	Analyze(ctx *gin.Context, uuid string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception)
+	Update(ctx *gin.Context, data dto.QuizUpdateReq) *exceptions.Exception
 	Delete(ctx *gin.Context, uuid string) *exceptions.Exception
 }

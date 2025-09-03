@@ -93,9 +93,9 @@ func (s *CompServicesImpl) Create(ctx *gin.Context, data dto.QuizReq) *exception
 	input.Questions = helpers.FormatToJSON(data.Questions)
 	input.CategoryUUID = existCategory.UUID
 
-	result := s.repo.Create(ctx, tx, input)
-	if result != nil {
-		return result
+	err = s.repo.Create(ctx, tx, input)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -295,6 +295,44 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 	return &pdfBuf, nil
 }
 
+func (s *CompServicesImpl) Update(ctx *gin.Context, data dto.QuizUpdateReq) *exceptions.Exception {
+	validateErr := s.validate.Struct(data)
+	if validateErr != nil {
+		return exceptions.NewValidationException(validateErr)
+	}
+
+	tx := s.DB.Begin()
+	defer helpers.CommitOrRollback(tx)
+
+	existCategory, err := s.repo.FindCategoryByName(ctx, tx, data.Category)
+	if err != nil {
+		if err.Status == http.StatusNotFound && existCategory == nil {
+			existCategory = &models.QuizCategory{
+				UUID: uuid.NewString(),
+				Name: data.Category,
+			}
+			err = s.repo.CreateCategory(ctx, tx, *existCategory)
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
+	input := mapper.MapQuizUTM(data)
+	input.Slug = helpers.SlugifyUnique(data.Title)
+	input.Questions = helpers.FormatToJSON(data.Questions)
+	input.CategoryUUID = existCategory.UUID
+
+	err = s.repo.Update(ctx, tx, input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
 	return s.repo.Delete(ctx, s.DB, uuid)
-} 
+}

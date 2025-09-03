@@ -13,6 +13,7 @@ func QuizRoutes(r *gin.RouterGroup, compControllers controllers.CompControllers)
 		quizGroup.GET("/search", compControllers.Search)
 		quizGroup.GET("/:slug", compControllers.FindBySlug)
 		quizGroup.POST("/create", compControllers.Create)
+		quizGroup.PUT("/update/:uuid", compControllers.Update)
 		quizGroup.DELETE("/delete/:uuid", compControllers.Delete)
 	}
 }

@@ -17,9 +17,10 @@ type CompRepositories interface {
 	Search(ctx *gin.Context, tx *gorm.DB, data dto.SearchReq) ([]models.Quiz, *exceptions.Exception)
 	FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Quiz, *exceptions.Exception)
 	FindBySlug(ctx *gin.Context, tx *gorm.DB, slug string) (*models.Quiz, *exceptions.Exception)
+	Update(ctx *gin.Context, tx *gorm.DB, data models.Quiz) *exceptions.Exception
+	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 	CreateCertificate(ctx *gin.Context, tx *gorm.DB, data models.QuizCertificate) *exceptions.Exception
 	FindCertificateByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.QuizCertificate, *exceptions.Exception)
 	FindCertificateByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.QuizCertificate, *exceptions.Exception)
 	FindCertificateByQuizUUIDandUserUUID(ctx *gin.Context, tx *gorm.DB, quizUUID string, userUUID string) (*models.QuizCertificate, *exceptions.Exception)
-	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 }

@@ -73,6 +73,21 @@ func (h *CompControllersImpl) Search(ctx *gin.Context) {
 	})
 }
 
+func (h *CompControllersImpl) FindByUUID(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	data, err := h.services.FindByUUID(ctx, uuid)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}
+
 func (h *CompControllersImpl) FindBySlug(ctx *gin.Context) {
 	slug := ctx.Param("slug")
 	data, err := h.services.FindBySlug(ctx, slug)

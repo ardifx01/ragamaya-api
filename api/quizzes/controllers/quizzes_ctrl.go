@@ -7,6 +7,7 @@ type CompControllers interface {
 	FindAllCategories(ctx *gin.Context)
 	Search(ctx *gin.Context)
 	FindBySlug(ctx *gin.Context)
+	FindByUUID(ctx *gin.Context) 
 	Analyze(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)

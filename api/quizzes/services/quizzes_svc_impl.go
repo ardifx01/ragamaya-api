@@ -131,6 +131,16 @@ func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizP
 	return &output, nil
 }
 
+func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.QuizDetailRes, *exceptions.Exception) {
+	result, err := s.repo.FindByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	output := mapper.MapQuizMTDO(*result)
+	return &output, nil
+}
+
 func (s *CompServicesImpl) Analyze(ctx *gin.Context, quizUUID string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception) {
 	validateErr := s.validate.Struct(data)
 	if validateErr != nil {

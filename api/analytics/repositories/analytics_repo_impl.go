@@ -385,7 +385,7 @@ func (r *CompRepositoriesImpl) FindMonthlyPayouts(ctx *gin.Context, tx *gorm.DB,
 			FROM generate_series(0, 11) gs
 		)
 		SELECT m.month as Month,
-			COALESCE(COUNT(wp.uuid), 0) as TotalPayout
+			COALESCE(COUNT(wp.uuid), 0) as total_payout
 		FROM months m
 		LEFT JOIN wallet_payout_requests wp 
 			ON TO_CHAR(wp.created_at, 'YYYY-MM') = m.month

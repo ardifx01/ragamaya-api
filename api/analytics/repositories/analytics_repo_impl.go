@@ -148,7 +148,7 @@ func (r *CompRepositoriesImpl) FindMonthlyNewSellers(ctx *gin.Context, tx *gorm.
 func (r *CompRepositoriesImpl) FindTotalRevenue(ctx *gin.Context, tx *gorm.DB) (int64, *exceptions.Exception) {
 	var total int64
 	err := tx.Model(&models.Orders{}).
-		Where("status = ?", "success").
+		Where("status = ?", "settlement").
 		Select("COALESCE(SUM(gross_amt), 0)").
 		Row().
 		Scan(&total)
@@ -170,7 +170,7 @@ func (r *CompRepositoriesImpl) FindMonthlyRevenue(ctx *gin.Context, tx *gorm.DB)
 		FROM months m
 		LEFT JOIN orders o 
 			ON TO_CHAR(o.created_at, 'YYYY-MM') = m.month
-			AND o.status = 'success'
+			AND o.status = 'settlement'
 		GROUP BY m.month
 		ORDER BY m.month DESC;
 	`
@@ -183,7 +183,7 @@ func (r *CompRepositoriesImpl) FindMonthlyRevenue(ctx *gin.Context, tx *gorm.DB)
 func (r *CompRepositoriesImpl) FindAverageOrderValue(ctx *gin.Context, tx *gorm.DB) (float64, *exceptions.Exception) {
 	var avg float64
 	err := tx.Model(&models.Orders{}).
-		Where("status = ?", "success").
+		Where("status = ?", "settlement").
 		Select("COALESCE(AVG(gross_amt), 0)").
 		Row().
 		Scan(&avg)
@@ -198,7 +198,7 @@ func (r *CompRepositoriesImpl) FindRevenueByProductType(ctx *gin.Context, tx *go
 	err := tx.Model(&models.Orders{}).
 		Select("products.product_type, COALESCE(SUM(orders.gross_amt), 0) as revenue").
 		Joins("JOIN products ON orders.product_uuid = products.uuid").
-		Where("orders.status = ?", "success").
+		Where("orders.status = ?", "settlement").
 		Group("products.product_type").
 		Find(&results).Error
 	if err != nil {

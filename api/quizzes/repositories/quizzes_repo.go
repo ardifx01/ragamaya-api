@@ -21,4 +21,5 @@ type CompRepositories interface {
 	FindCertificateByUUID(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.QuizCertificate, *exceptions.Exception)
 	FindCertificateByUserUUID(ctx *gin.Context, tx *gorm.DB, uuid string) ([]models.QuizCertificate, *exceptions.Exception)
 	FindCertificateByQuizUUIDandUserUUID(ctx *gin.Context, tx *gorm.DB, quizUUID string, userUUID string) (*models.QuizCertificate, *exceptions.Exception)
+	Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception
 }

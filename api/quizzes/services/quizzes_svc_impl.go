@@ -294,3 +294,7 @@ func (s *CompServicesImpl) GenerateCertificate(data dto.CertificateReq) (*[]byte
 
 	return &pdfBuf, nil
 }
+
+func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
+	return s.repo.Delete(ctx, s.DB, uuid)
+} 

@@ -8,4 +8,5 @@ type CompControllers interface {
 	Search(ctx *gin.Context)
 	FindBySlug(ctx *gin.Context)
 	Analyze(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }

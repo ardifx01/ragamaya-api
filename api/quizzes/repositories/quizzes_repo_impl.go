@@ -146,3 +146,11 @@ func (r *CompRepositoriesImpl) FindCertificateByQuizUUIDandUserUUID(ctx *gin.Con
 	}
 	return &certificate, nil
 }
+
+func (r *CompRepositoriesImpl) Delete(ctx *gin.Context, tx *gorm.DB, uuid string) *exceptions.Exception {
+	err := tx.Where("uuid = ?", uuid).Delete(&models.Quiz{}).Error
+	if err != nil {
+		return exceptions.ParseGormError(tx, err)
+	}
+	return nil
+}

@@ -1,10 +1,16 @@
 package services
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"ragamaya-api/api/analytics/dto"
 	"ragamaya-api/api/analytics/repositories"
 	"ragamaya-api/models"
+	"ragamaya-api/pkg/cache"
 	"ragamaya-api/pkg/exceptions"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -15,17 +21,106 @@ type CompServicesImpl struct {
 	repo     repositories.CompRepositories
 	DB       *gorm.DB
 	validate *validator.Validate
+	cache    *cache.RedisCache
 }
 
-func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate) CompServices {
-	return &CompServicesImpl{
+func NewComponentServices(compRepositories repositories.CompRepositories, db *gorm.DB, validate *validator.Validate, cache *cache.RedisCache) CompServices {
+	svc := &CompServicesImpl{
 		repo:     compRepositories,
 		DB:       db,
 		validate: validate,
+		cache:    cache,
+	}
+
+	go svc.startCacheRevalidation()
+	return svc
+}
+
+const (
+	analyticsCacheKey = "analytics:dashboard"
+	cacheDuration     = 10 * time.Minute
+)
+
+func (s *CompServicesImpl) startCacheRevalidation() {
+	revalidate := func() {
+		if _, err := s.getAndCacheAnalytics(context.Background()); err != nil {
+			fmt.Printf("Error revalidating analytics cache: %v\n", err)
+		}
+	}
+
+	revalidate()
+	ticker := time.NewTicker(cacheDuration)
+	for range ticker.C {
+		revalidate()
 	}
 }
 
+func (s *CompServicesImpl) getAndCacheAnalytics(ctx context.Context) (*dto.AnalyticRes, *exceptions.Exception) {
+	orderAnalytics, err := s.getOrderAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	payoutAnalytics, err := s.getPayoutAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	productAnalytics, err := s.getProductAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	userAnalytics, err := s.getUserAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	revenueAnalytics, err := s.getRevenueAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	platformAnalytics, err := s.getPlatformAnalytics(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	analytics := &dto.AnalyticRes{
+		AnalyticOrder:    *orderAnalytics,
+		AnalyticPayout:   *payoutAnalytics,
+		AnalyticProduct:  *productAnalytics,
+		AnalyticUser:     *userAnalytics,
+		AnalyticRevenue:  *revenueAnalytics,
+		AnalyticPlatform: *platformAnalytics,
+	}
+
+	data, exc := json.Marshal(analytics)
+	if exc != nil {
+		return nil, exceptions.NewException(http.StatusInternalServerError, "Failed to marshal analytics data")
+	}
+
+	if err := s.cache.Set(ctx, analyticsCacheKey, data, cacheDuration); err != nil {
+		return nil, exceptions.NewException(http.StatusInternalServerError, "Failed to cache analytics data")
+	}
+
+	return analytics, nil
+}
+
 func (s *CompServicesImpl) GetAnalytics(ctx *gin.Context) (*dto.AnalyticRes, *exceptions.Exception) {
+	data, err := s.cache.Get(ctx, analyticsCacheKey)
+	if err == nil {
+
+		var analytics dto.AnalyticRes
+		if err := json.Unmarshal(data, &analytics); err == nil {
+			return &analytics, nil
+		}
+	}
+
+	return s.getAndCacheAnalytics(ctx)
+}
+
+func (s *CompServicesImpl) GetAnalyticsOld(ctx *gin.Context) (*dto.AnalyticRes, *exceptions.Exception) {
 	orderAnalytics, err := s.getOrderAnalytics(ctx)
 	if err != nil {
 		return nil, err

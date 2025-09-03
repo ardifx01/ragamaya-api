@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"ragamaya-api/pkg/cache"
 	"ragamaya-api/pkg/config"
 	"ragamaya-api/pkg/middleware"
 	"ragamaya-api/routers"
@@ -46,12 +47,13 @@ func main() {
 	midtransCore := config.InitMidtrans()
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	lmt := tollbooth.NewLimiter(5, &limiter.ExpirableOptions{DefaultExpirationTTL: time.Second})
+	cache := cache.NewRedisCache(config.RedisClient, cache.DefaultCacheOptions())
 
 	r.Use(middleware.GzipResponseMiddleware())
 	r.Use(middleware.RateLimitMiddleware(lmt))
 
 	internal := r.Group("/internal")
-	internalRouters.InternalRouters(internal, db, storage, validate)
+	internalRouters.InternalRouters(internal, db, storage, validate, cache)
 
 	midtrans := r.Group("/midtrans")
 	midtransRouters.MidtransRouters(midtrans, db, validate, midtransCore)

@@ -25,7 +25,7 @@ import (
 	orderControllers "ragamaya-api/api/orders/controllers"
 	orderRepositories "ragamaya-api/api/orders/repositories"
 	orderServices "ragamaya-api/api/orders/services"
-	
+
 	paymentControllers "ragamaya-api/api/payments/controllers"
 	paymentRepositories "ragamaya-api/api/payments/repositories"
 	paymentServices "ragamaya-api/api/payments/services"
@@ -33,35 +33,36 @@ import (
 	walletControllers "ragamaya-api/api/wallets/controllers"
 	walletRepositories "ragamaya-api/api/wallets/repositories"
 	walletServices "ragamaya-api/api/wallets/services"
-	
+
 	articleControllers "ragamaya-api/api/articles/controllers"
 	articleRepositories "ragamaya-api/api/articles/repositories"
 	articleServices "ragamaya-api/api/articles/services"
-	
+
 	quizControllers "ragamaya-api/api/quizzes/controllers"
 	quizRepositories "ragamaya-api/api/quizzes/repositories"
 	quizServices "ragamaya-api/api/quizzes/services"
-	
+
 	predictControllers "ragamaya-api/api/predicts/controllers"
 	predictRepositories "ragamaya-api/api/predicts/repositories"
 	predictServices "ragamaya-api/api/predicts/services"
-	
+
 	analyticControllers "ragamaya-api/api/analytics/controllers"
 	analyticRepositories "ragamaya-api/api/analytics/repositories"
 	analyticServices "ragamaya-api/api/analytics/services"
-	
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"github.com/midtrans/midtrans-go/coreapi"
 	"gorm.io/gorm"
+	"ragamaya-api/pkg/cache"
 )
 
 var userFeatureSet = wire.NewSet(
 	userRepositories.NewComponentRepository,
 	userServices.NewComponentServices,
 	userControllers.NewCompController,
-	
+
 	walletRepositories.NewComponentRepository,
 )
 
@@ -89,7 +90,7 @@ var orderFeatureSet = wire.NewSet(
 	orderRepositories.NewComponentRepository,
 	orderServices.NewComponentServices,
 	orderControllers.NewCompController,
-	
+
 	paymentRepositories.NewComponentRepository,
 	productRepositories.NewComponentRepository,
 )
@@ -116,7 +117,7 @@ var quizFeatureSet = wire.NewSet(
 	quizRepositories.NewComponentRepository,
 	quizServices.NewComponentServices,
 	quizControllers.NewCompController,
-	
+
 	storageRepositories.NewComponentRepository,
 	storageServices.NewComponentServices,
 )
@@ -173,7 +174,7 @@ func InitializeArticleController(db *gorm.DB, validate *validator.Validate) arti
 	return nil
 }
 
-func InitializeQuizController(db *gorm.DB, s3client *s3.Client,  validate *validator.Validate) quizControllers.CompControllers {
+func InitializeQuizController(db *gorm.DB, s3client *s3.Client, validate *validator.Validate) quizControllers.CompControllers {
 	wire.Build(quizFeatureSet)
 	return nil
 }
@@ -183,7 +184,7 @@ func InitializePredictController(db *gorm.DB, validate *validator.Validate) pred
 	return nil
 }
 
-func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate) analyticControllers.CompControllers {
+func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate, cache *cache.RedisCache) analyticControllers.CompControllers {
 	wire.Build(analyticFeatureSet)
 	return nil
 }

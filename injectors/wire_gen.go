@@ -45,6 +45,7 @@ import (
 	controllers7 "ragamaya-api/api/wallets/controllers"
 	repositories2 "ragamaya-api/api/wallets/repositories"
 	services7 "ragamaya-api/api/wallets/services"
+	"ragamaya-api/pkg/cache"
 )
 
 // Injectors from injector.go:
@@ -125,9 +126,9 @@ func InitializePredictController(db *gorm.DB, validate *validator.Validate) cont
 	return compControllers
 }
 
-func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate) controllers11.CompControllers {
+func InitializeAnalyticController(db *gorm.DB, validate *validator.Validate, cache2 *cache.RedisCache) controllers11.CompControllers {
 	compRepositories := repositories11.NewComponentRepository()
-	compServices := services11.NewComponentServices(compRepositories, db, validate)
+	compServices := services11.NewComponentServices(compRepositories, db, validate, cache2)
 	compControllers := controllers11.NewCompController(compServices)
 	return compControllers
 }

@@ -3,6 +3,7 @@ package routers
 import (
 	"ragamaya-api/injectors"
 	internalInjectors "ragamaya-api/internal/injectors"
+	"ragamaya-api/pkg/cache"
 	"ragamaya-api/pkg/middleware"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -11,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InternalRouters(r *gin.RouterGroup, db *gorm.DB, s3client *s3.Client, validate *validator.Validate) {
+func InternalRouters(r *gin.RouterGroup, db *gorm.DB, s3client *s3.Client, validate *validator.Validate, cache *cache.RedisCache) {
 	internalController := internalInjectors.InitializeAuthController(validate)
 	AuthRoutes(r, internalController)
 
@@ -21,7 +22,7 @@ func InternalRouters(r *gin.RouterGroup, db *gorm.DB, s3client *s3.Client, valid
 	articleController := injectors.InitializeArticleController(db, validate)
 	storageController := injectors.InitializeStorageController(db, s3client, validate)
 	quizController := injectors.InitializeQuizController(db, s3client, validate)
-	analyticController := injectors.InitializeAnalyticController(db, validate)
+	analyticController := injectors.InitializeAnalyticController(db, validate, cache)
 
 	WalletRouter(r, walletController)
 	ArticleRoutes(r, articleController)

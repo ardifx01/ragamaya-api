@@ -41,8 +41,8 @@ type CacheOptions struct {
 // DefaultCacheOptions returns default cache options
 func DefaultCacheOptions() *CacheOptions {
 	return &CacheOptions{
-		DefaultTTL: 5 * time.Minute,
-		MaxSize:    1000,
+		DefaultTTL: 15 * time.Minute,
+		MaxSize:    10000,
 		Prefix:     "cache:",
 	}
 }

@@ -16,7 +16,7 @@ type AnalyticRes struct {
 }
 
 type AnalyticProductRes struct {
-	TotalProducts         int64                  `json:"total_products"`
+	TotalProducts         int64                  `json:"total_active_products"`
 	TotalDigitalProducts  int64                  `json:"total_digital_products"`
 	TotalPhysicalProducts int64                  `json:"total_physical_products"`
 	TopSellingProducts    []TopSellingProductRes `json:"top_selling_products"`

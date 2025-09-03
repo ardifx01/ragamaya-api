@@ -1,9 +1,10 @@
-version: '3.8'
-
 services:
   ragamaya-api:
-    image: ragamaya-api:latest
     container_name: ragamaya-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "ragamaya-api:1.0.4"
     dns:
       - 8.8.8.8
       - 1.1.1.1
@@ -13,4 +14,3 @@ services:
     environment:
       - CHROME_BIN=/usr/bin/google-chrome
       - CHROME_PATH=/usr/bin/google-chrome
-    restart: unless-stopped

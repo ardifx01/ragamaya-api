@@ -57,12 +57,14 @@ type QuizPublicDetailRes struct {
 	TotalQuestions int       `json:"total_questions"`
 
 	Questions []QuizPublicQuestionRes `json:"questions"`
-	Category  *CategoryRes      `json:"category"`
+	Category  *CategoryRes            `json:"category"`
+
+	Certificate *CertificateRes `json:"certificate,omitempty"`
 }
 
 type QuizPublicQuestionRes struct {
-	Question    string   `json:"question" validate:"required"`
-	Options     []string `json:"options" validate:"required"`
+	Question string   `json:"question" validate:"required"`
+	Options  []string `json:"options" validate:"required"`
 }
 
 type AnalyzeStatus string

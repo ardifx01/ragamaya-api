@@ -145,3 +145,61 @@ func SellerMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func OptionalMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		secret := config.GetJWTSecret()
+		var secretKey = []byte(secret)
+		var tokenString string
+
+		authHeader := c.GetHeader("Authorization")
+		if authHeader != "" {
+			authHeaderParts := strings.Split(authHeader, " ")
+			if len(authHeaderParts) != 2 || authHeaderParts[0] != "Bearer" {
+				c.Next()
+				return
+			} else {
+				tokenString = authHeaderParts[1]
+			}
+		} else if c.Query("authorization") != "" {
+			tokenString = c.Query("authorization")
+		} else {
+			c.Next()
+			return
+		}
+
+		isBlacklisted, _ := helpers.IsTokenBlacklisted(tokenString)
+		if isBlacklisted {
+			c.Next()
+			return
+		}
+
+		claims := jwt.MapClaims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+
+		if err != nil {
+			c.Next()
+			return
+		}
+
+		if !token.Valid {
+			c.Next()
+			return
+		}
+
+		user := dto.UserRes{
+			UUID:            claims["uuid"].(string),
+			Email:           claims["email"].(string),
+			IsEmailVerified: claims["is_email_verified"].(bool),
+			SUB:             claims["sub"].(string),
+			Name:            claims["name"].(string),
+			Role:            dto.Roles(claims["role"].(string)),
+			AvatarURL:       claims["avatar_url"].(string),
+		}
+
+		c.Set("user", user)
+		c.Next()
+	}
+}

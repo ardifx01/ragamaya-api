@@ -128,6 +128,16 @@ func (s *CompServicesImpl) FindBySlug(ctx *gin.Context, slug string) (*dto.QuizP
 	}
 
 	output := mapper.MapQuizMTPDO(*result)
+
+	userData, _ := helpers.GetUserData(ctx)
+	if userData.UUID != "" {
+		certificate, _ := s.repo.FindCertificateByQuizUUIDandUserUUID(ctx, s.DB, result.UUID, userData.UUID)
+		if certificate != nil {
+			cert := mapper.MapCertificateMTO(*certificate)
+			output.Certificate = &cert
+		}
+	}
+
 	return &output, nil
 }
 

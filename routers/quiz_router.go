@@ -12,7 +12,7 @@ func QuizRoutes(r *gin.RouterGroup, compControllers controllers.CompControllers)
 	{
 		quizGroup.GET("/categories", compControllers.FindAllCategories)
 		quizGroup.GET("/search", compControllers.Search)
-		quizGroup.GET("/:slug", compControllers.FindBySlug)
+		quizGroup.GET("/:slug", middleware.OptionalMiddleware(), compControllers.FindBySlug)
 		quizGroup.POST("/analyze/:uuid", middleware.AuthMiddleware(), compControllers.Analyze)
 	}
 }

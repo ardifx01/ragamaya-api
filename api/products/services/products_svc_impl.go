@@ -101,6 +101,11 @@ func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.Produ
 	}
 
 	output := mapper.MapProductMTO(*product)
+	userData, _ := helpers.GetUserData(ctx)
+	if userData.UUID != "" {
+		isOwned := s.repo.IsProductDigitalOwned(ctx, s.DB, userData.UUID, product.UUID)
+		output.IsOwned = isOwned
+	}
 	return &output, nil
 }
 

@@ -16,6 +16,7 @@ type ProductRes struct {
 	Price       uint        `json:"price" validate:"required"`
 	Stock       int         `json:"stock" validate:"required"`
 	Keywords    string      `json:"keywords" validate:"required"`
+	IsOwned     bool        `json:"is_owned,omitempty"`
 
 	Thumbnails   []ProductThumbnailsRes `json:"thumbnails" validate:"required,dive"`
 	DigitalFiles []ProductDigitalFiles  `json:"digital_files,omitempty" validate:"required,dive"`

@@ -31,8 +31,8 @@ func main() {
 
 	port := config.GetPort()
 
-	r := gin.New()
-	r.Use(middleware.RequestResponseLogger())
+	r := gin.Default()
+	// r.Use(middleware.RequestResponseLogger())
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"*"}

@@ -10,6 +10,11 @@ import (
 
 func GzipResponseMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if strings.HasSuffix(c.Request.URL.Path, "/stream") {
+			c.Next()
+			return
+		}
+
 		if !strings.Contains(c.Request.Header.Get("Accept-Encoding"), "gzip") {
 			c.Next()
 			return

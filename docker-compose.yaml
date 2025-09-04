@@ -18,3 +18,7 @@ services:
       - .env
     networks:
       - ragamaya-net
+
+networks:
+  ragamaya-net:
+    driver: bridge

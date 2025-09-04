@@ -16,3 +16,5 @@ services:
       - CHROME_PATH=/usr/bin/google-chrome
     env_file:
       - .env
+    networks:
+      - ragamaya-net

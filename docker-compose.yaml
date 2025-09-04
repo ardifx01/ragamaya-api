@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   ragamaya-api:
     container_name: ragamaya-api
@@ -5,9 +7,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: "ragamaya-api:1.0.4"
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
     ports:
       - "${PORT}:${PORT}"
     shm_size: '2gb'

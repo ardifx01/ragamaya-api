@@ -95,17 +95,28 @@ func (s *CompServicesImpl) Update(ctx *gin.Context, uuid string, data dto.Produc
 }
 
 func (s *CompServicesImpl) FindByUUID(ctx *gin.Context, uuid string) (*dto.ProductRes, *exceptions.Exception) {
-	product, result := s.repo.FindByUUID(ctx, s.DB, uuid)
-	if result != nil {
-		return nil, result
-	}
-
-	output := mapper.MapProductMTO(*product)
 	userData, _ := helpers.GetUserData(ctx)
+	
+	var product *models.Products
+	var result *exceptions.Exception
+	var isOwned bool
+	
 	if userData.UUID != "" {
-		isOwned := s.repo.IsProductDigitalOwned(ctx, s.DB, userData.UUID, product.UUID)
-		output.IsOwned = isOwned
+		product, result = s.repo.FindByUUIDWithFile(ctx, s.DB, uuid)
+		if result != nil {
+			return nil, result
+		}
+		isOwned = s.repo.IsProductDigitalOwned(ctx, s.DB, userData.UUID, uuid)
+	} else {
+		product, result = s.repo.FindByUUID(ctx, s.DB, uuid)
+		if result != nil {
+			return nil, result
+		}
 	}
+	
+	output := mapper.MapProductMTO(*product)
+	output.IsOwned = isOwned
+	
 	return &output, nil
 }
 

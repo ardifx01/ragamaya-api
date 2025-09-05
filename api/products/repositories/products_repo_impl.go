@@ -45,6 +45,21 @@ func (r *CompRepositoriesImpl) FindByUUID(ctx *gin.Context, tx *gorm.DB, uuid st
 	return &seller, nil
 }
 
+func (r *CompRepositoriesImpl) FindByUUIDWithFile(ctx *gin.Context, tx *gorm.DB, uuid string) (*models.Products, *exceptions.Exception) {
+	var seller models.Products
+	err := tx.
+		Where("uuid = ?", uuid).
+		Preload("Seller").
+		Preload("Thumbnails").
+		Preload("DigitalFiles").
+		First(&seller).
+		Error
+	if err != nil {
+		return nil, exceptions.ParseGormError(tx, err)
+	}
+	return &seller, nil
+}
+
 func (r *CompRepositoriesImpl) Update(ctx *gin.Context, tx *gorm.DB, data models.Products) *exceptions.Exception {
 	result := tx.Where("uuid = ?", data.UUID).Updates(&data)
 	if result.Error != nil {

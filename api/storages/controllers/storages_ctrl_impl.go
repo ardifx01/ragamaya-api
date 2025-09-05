@@ -193,7 +193,7 @@ func (h *CompControllersImpl) General(ctx *gin.Context) {
 		return
 	}
 
-	if files[0].Size > (10 * 1024 * 1024) {
+	if files[0].Size > (30 * 1024 * 1024) {
 		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, "File size exceeds 10MB"))
 		return
 	}

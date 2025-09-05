@@ -169,3 +169,23 @@ func (h *CompControllersImpl) Delete(ctx *gin.Context) {
 		Message: "delete success",
 	})
 }
+
+func (h *CompControllersImpl) FindCertificateByUUID(ctx *gin.Context) {
+	uuid := ctx.Param("uuid")
+	if uuid == "" {
+		ctx.JSON(http.StatusBadRequest, exceptions.NewException(http.StatusBadRequest, exceptions.ErrBadRequest))
+		return
+	}
+
+	data, err := h.services.FindCertificateByUUID(ctx, uuid)
+	if err != nil {
+		ctx.JSON(err.Status, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.Response{
+		Status:  http.StatusOK,
+		Message: "data retrieved successfully",
+		Body:    data,
+	})
+}

@@ -16,4 +16,5 @@ type CompServices interface {
 	Analyze(ctx *gin.Context, uuid string, data dto.AnalyzeReq) (*dto.AnalyzeRes, *exceptions.Exception)
 	Update(ctx *gin.Context, data dto.QuizUpdateReq) *exceptions.Exception
 	Delete(ctx *gin.Context, uuid string) *exceptions.Exception
+	FindCertificateByUUID(ctx *gin.Context, uuid string) (*dto.CertificateDetailRes, *exceptions.Exception)
 }

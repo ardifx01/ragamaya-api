@@ -61,3 +61,10 @@ func MapCertificateMTO(model models.QuizCertificate) dto.CertificateRes {
 	output.CreatedAt = model.CreatedAt
 	return output
 }
+
+func MapCertificateMTDO(model models.QuizCertificate) dto.CertificateDetailRes {
+	var output dto.CertificateDetailRes
+	mapstructure.Decode(model, &output)
+	output.CreatedAt = model.CreatedAt
+	return output
+}

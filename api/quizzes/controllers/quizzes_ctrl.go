@@ -11,4 +11,5 @@ type CompControllers interface {
 	Analyze(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	FindCertificateByUUID(ctx *gin.Context)
 }

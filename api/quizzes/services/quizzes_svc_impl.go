@@ -403,3 +403,13 @@ func (s *CompServicesImpl) Update(ctx *gin.Context, data dto.QuizUpdateReq) *exc
 func (s *CompServicesImpl) Delete(ctx *gin.Context, uuid string) *exceptions.Exception {
 	return s.repo.Delete(ctx, s.DB, uuid)
 }
+
+func (s *CompServicesImpl) FindCertificateByUUID(ctx *gin.Context, uuid string) (*dto.CertificateDetailRes, *exceptions.Exception) {
+	certificate, err := s.repo.FindCertificateByUUID(ctx, s.DB, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	result := mapper.MapCertificateMTDO(*certificate)
+	return &result, nil
+}

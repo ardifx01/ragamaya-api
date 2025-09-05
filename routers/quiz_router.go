@@ -14,5 +14,10 @@ func QuizRoutes(r *gin.RouterGroup, compControllers controllers.CompControllers)
 		quizGroup.GET("/search", compControllers.Search)
 		quizGroup.GET("/:slug", middleware.OptionalMiddleware(), compControllers.FindBySlug)
 		quizGroup.POST("/analyze/:uuid", middleware.AuthMiddleware(), compControllers.Analyze)
+
+		certificateGroup := quizGroup.Group("/certificate")
+		{
+			certificateGroup.GET("/:uuid", compControllers.FindCertificateByUUID)
+		}
 	}
 }

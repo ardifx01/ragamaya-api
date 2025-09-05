@@ -87,3 +87,18 @@ type CertificateRes struct {
 	CertificateURL string    `json:"certificate_url"`
 	CreatedAt      time.Time `json:"created_at"`
 }
+
+type CertificateDetailRes struct {
+	UUID           string    `json:"uuid"`
+	Score          float32   `json:"score"`
+	CertificateURL string    `json:"certificate_url"`
+	CreatedAt      time.Time `json:"created_at"`
+	Quiz           *QuizRes  `json:"quiz"`
+	User           *UserRes  `json:"user"`
+}
+
+type UserRes struct {
+	UUID      string `json:"uuid"`
+	Name      string `json:"name"`
+	AvatarURL string `json:"avatar_url"`
+}

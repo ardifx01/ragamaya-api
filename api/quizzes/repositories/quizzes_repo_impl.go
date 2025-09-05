@@ -143,6 +143,7 @@ func (r *CompRepositoriesImpl) FindCertificateByUUID(ctx *gin.Context, tx *gorm.
 	var certificate models.QuizCertificate
 	err := tx.Where("uuid = ?", uuid).
 		Preload("Quiz").
+		Preload("Quiz.Category").
 		Preload("User").
 		First(&certificate).Error
 	if err != nil {

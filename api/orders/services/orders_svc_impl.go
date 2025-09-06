@@ -220,7 +220,7 @@ func (s *CompServicesImpl) createChargeRequest(order *models.Orders, userData *u
 			Unit:           "minute",
 		},
 		ShopeePay: &coreapi.ShopeePayDetails{
-			CallbackUrl: fmt.Sprintf("%s/payments/%s", config.GetFrontendBaseURL(), order.UUID),
+			CallbackUrl: fmt.Sprintf("%s/payment/%s", config.GetFrontendBaseURL(), order.UUID),
 		},
 	}
 
